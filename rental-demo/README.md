@@ -18,13 +18,13 @@ python3 rental-demo/server.py
 
 - 기본 모델: `gpt-4.1-mini`. 서버 환경 변수 `OPENAI_MODEL`로 이미지 입력과 Structured Outputs를 지원하는 모델을 지정할 수 있습니다.
 - 포트 변경: `.env`의 `PORT`. 기본값은 8001입니다.
-- 기존 `python3 실험용.py` 정적 서버에서는 AI API가 동작하지 않습니다. 전용 서버를 사용하세요.
+- `python3 실험용.py`도 같은 전용 서버를 실행하는 호환 진입점입니다. 별도 정적 서버에서는 AI API가 동작하지 않습니다.
 
 ## 실제 AI 기능
 
 | 화면 | 전송 자료 | 결과 |
 | --- | --- | --- |
-| 입주/퇴실 기록 | 선택한 사진 1장, 해당 공간의 메모 | 관찰 위치·하자 후보·추가 촬영 질문 |
+| 입주/퇴실 기록 | 선택한 사진 1장, 해당 공간의 메모 | 한국어 상태 태그·관찰 위치·하자 후보·추가 촬영 질문 |
 | 특약 | 입력한 텍스트 | 원문 인용·불명확한 범위·확인 질문 |
 | 전후 비교 | 입주 사진, 퇴실 사진 순서로 2장 및 메모 | 기존 흔적 가능·새 변화 가능·판단 보류 |
 | 대응 문장 | 공제 항목·금액 및 저장된 입주 메모 | 중립적인 공제 내역 확인 요청 초안 |
@@ -73,3 +73,26 @@ node --check rental-demo/storage.js
 ## 구현 참고
 
 [OpenAI 이미지 입력](https://developers.openai.com/api/docs/guides/images-vision), [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs), [GPT-4.1 mini](https://developers.openai.com/api/docs/models/gpt-4.1-mini).
+
+## 사진 태그 사용과 GitHub 반영
+
+1. 입주/퇴실 기록에서 공간과 입주/퇴실 구분을 선택합니다.
+2. JPG/PNG/WEBP 사진(8MB 이하)을 등록하고 필요하면 메모를 입력합니다.
+3. 아래 **사진 분석 · 한국어 상태 태그**에서 전송 동의를 체크하고 분석 버튼을 누릅니다.
+4. 결과의 **AI 상태 태그**와 관찰 근거를 확인합니다. 예: `#긁힘`, `#얼룩`, `#균열`.
+5. 공간 기록을 저장한 뒤 리포트를 내려받으면 AI 태그도 포함됩니다.
+
+`tags`는 `analysis.tags` 문자열 배열로 반환됩니다. 허용 태그는 긁힘, 찍힘, 균열, 들뜸, 변색, 얼룩, 곰팡이 의심, 물자국, 녹, 파손, 판단 보류이며 중복 없이 최대 6개입니다. 빈 배열은 눈에 띄는 흔적을 찾지 못했다는 뜻이며 하자가 없음을 보장하지 않습니다. 사진 이외 분석에는 빈 배열을 요청합니다. 이전 버전에서 저장한 태그 없는 응답도 계속 열 수 있습니다. 입력 사진·메모가 바뀌면 기존 결과에 이전 자료라는 안내가 표시됩니다.
+
+기존 서버가 키 보관·동일 출처 API·요청 제한을 제공하므로 별도 FastAPI 서버나 패키지를 추가하지 않았습니다. 브라우저는 `/api/analyze`로 사진 data URL을 보내고, Python 서버만 OpenAI Responses API를 호출합니다. 정적 GitHub Pages에서는 이 서버가 실행되지 않습니다.
+
+작업 브랜치에서 검증 후 아래처럼 커밋·푸시하고 GitHub에서 main 대상으로 Pull Request를 엽니다. main에 직접 커밋하거나 푸시하지 않습니다.
+
+```bash
+git switch feat/housing-photo-tags
+git add README.md index.html rental-demo
+git commit -m "feat: add Korean condition tags to photo analysis"
+git push -u origin feat/housing-photo-tags
+```
+
+실제 연결 확인: 서버를 실행하고 `/api/health`의 `configured`가 true인지 확인한 뒤 위 화면에서 사진을 분석합니다. 키 누락(503), 잘못된 파일(400), 잘못된 키/모델 접근·잔액 부족, 네트워크 지연은 오류 안내로 표시하며 가짜 태그로 대체하지 않습니다. 실제 사진·유효한 키가 필요한 유료 호출과 실제 카메라 동작은 별도 확인해야 합니다.
