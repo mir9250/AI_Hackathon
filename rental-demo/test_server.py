@@ -3,6 +3,9 @@ import io
 import json
 import os
 from pathlib import Path
+import threading
+from http.server import ThreadingHTTPServer
+from urllib import request, error
 import unittest
 from unittest.mock import patch
 import server
@@ -11,7 +14,7 @@ IMAGE = 'data:image/png;base64,' + base64.b64encode(b'\x89PNG\r\n\x1a\nexample')
 
 
 def result(evidence='퇴실 청소비 10만 원'):
-    return {'summary': '확인할 질문이 있습니다.', 'observations': [{'location': '청소 특약', 'evidence': evidence,
+    return {'tags': [], 'summary': '확인할 질문이 있습니다.', 'observations': [{'location': '청소 특약', 'evidence': evidence,
             'interpretation': '산정 범위를 확인하세요.', 'certainty': '보통', 'category': '특약 확인'}],
             'questions': ['금액 산정 범위가 무엇인가요?'], 'next_steps': ['계약 전체를 확인하세요.'],
             'draft': '청소비 산정 내역 확인 부탁드립니다.', 'limitations': ['법적 유효성을 확정하지 않습니다.']}
@@ -80,6 +83,61 @@ class Tests(unittest.TestCase):
         value['observations'][0]['certainty'] = '99%'
         with self.assertRaises(server.ProviderError):
             server.validate_schema(value, server.SCHEMA)
+
+    def test_photo_tags_validation(self):
+        for tags in [['긁힘', '얼룩'], [], ['판단 보류']]:
+            value = result()
+            value['tags'] = tags
+            server.validate_schema(value, server.SCHEMA)
+        for tags in [['scratch'], ['긁힘', '긁힘'], server.PHOTO_TAGS[:7], [None], [{}]]:
+            value = result()
+            value['tags'] = tags
+            with self.assertRaises(server.ProviderError):
+                server.validate_schema(value, server.SCHEMA)
+        value = result()
+        del value['tags']
+        with self.assertRaises(server.ProviderError):
+            server.validate_schema(value, server.SCHEMA)
+
+    def test_http_photo_flow(self):
+        httpd = ThreadingHTTPServer(('127.0.0.1', 0), server.Handler)
+        thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+        thread.start()
+        base = f'http://127.0.0.1:{httpd.server_port}'
+        analysis = result()
+        analysis['tags'] = ['긁힘', '얼룩']
+        envelope = {'status': 'completed', 'model': 'test-model', 'output': [
+            {'content': [{'type': 'output_text', 'text': json.dumps(analysis)}]}]}
+        try:
+            with request.urlopen(base + '/') as response:
+                self.assertIn('ai-ui.js', response.read().decode())
+            with self.assertRaises(error.HTTPError) as exc:
+                request.urlopen(base + '/.env')
+            self.assertEqual(exc.exception.code, 404)
+            exc.exception.close()
+            body = {'task': 'photo', 'images': [IMAGE], 'consent': True}
+            outgoing = request.Request(base + '/api/analyze', data=json.dumps(body).encode(),
+                                       headers={'Content-Type': 'application/json', 'Origin': base})
+            # Only the provider transport is replaced. Local HTTP uses the original urlopen.
+            local_open = request.urlopen
+            def transport(req, *args, **kwargs):
+                if req.full_url == 'https://api.openai.com/v1/responses':
+                    payload = json.loads(req.data)
+                    self.assertEqual(payload['input'][0]['content'][1]['image_url'], IMAGE)
+                    return ProviderContext(json.dumps(envelope).encode())
+                return local_open(req, *args, **kwargs)
+            with patch.dict(os.environ, {'OPENAI_API_KEY': 'unit-test-only'}), patch('server.request.urlopen', side_effect=transport):
+                with local_open(outgoing) as response:
+                    self.assertEqual(json.load(response)['analysis']['tags'], ['긁힘', '얼룩'])
+            with patch.dict(os.environ, {'OPENAI_API_KEY': ''}):
+                with self.assertRaises(error.HTTPError) as exc:
+                    local_open(outgoing)
+                self.assertEqual(exc.exception.code, 503)
+                exc.exception.close()
+        finally:
+            httpd.shutdown()
+            httpd.server_close()
+            thread.join()
 
     def test_static_whitelist(self):
         self.assertNotIn('.env', server.ALLOWED_FILES)
