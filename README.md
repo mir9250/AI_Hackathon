@@ -2,6 +2,10 @@
 
 월세 입주부터 퇴실까지 공간을 기록하고, 실제 AI로 사진·특약을 살펴보며 보증금 정산을 준비하는 웹 프로토타입입니다.
 
+공개 데모: **https://dollyeobatjip-demo.newflask.chatgpt.site**
+
+노란색 `#FFD966`을 중심으로 로고와 화면 색상을 통일했습니다. 배포·접근 범위·AI 키 설정은 [DEPLOYMENT.md](DEPLOYMENT.md)를 확인하세요.
+
 ## 빠른 시작
 
 Python 3.9 이상. 외부 패키지 설치 없이 실행합니다.

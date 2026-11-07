@@ -3,3 +3,6 @@ __pycache__/
 .env
 .env.*
 !.env.example
+
+# Sites 소스는 별도 원격 저장소에서 관리합니다.
+sites/deposit-guardian/
