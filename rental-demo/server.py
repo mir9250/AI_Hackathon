@@ -16,7 +16,7 @@ from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent
 MAX_BODY = 24 * 1024 * 1024
-ALLOWED_FILES = {'index.html', 'app.js', 'style.css', 'ai-ui.js', 'storage.js', 'logo.png'}
+ALLOWED_FILES = {'index.html', 'app.js', 'style.css', 'ai-ui.js', 'storage.js', 'logo.png', 'account.js', 'records.js'}
 TASKS = {'photo', 'compare', 'contract', 'draft'}
 LIMIT = threading.BoundedSemaphore(2)
 CALLS = deque()

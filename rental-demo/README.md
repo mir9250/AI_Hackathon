@@ -62,6 +62,8 @@ AI 전송 전에 각 패널에서 전송 범위를 확인하고 동의 체크 �
 python3 -m unittest discover -s rental-demo -p 'test_*.py' -v
 node rental-demo/smoke-test.cjs
 node rental-demo/ai-smoke-test.cjs
+node rental-demo/photo-flow-test.cjs
+node rental-demo/ai-unconfigured-test.cjs
 node rental-demo/storage-smoke-test.cjs
 node --check rental-demo/app.js
 node --check rental-demo/ai-ui.js
@@ -96,3 +98,13 @@ git push -u origin feat/housing-photo-tags
 ```
 
 실제 연결 확인: 서버를 실행하고 `/api/health`의 `configured`가 true인지 확인한 뒤 위 화면에서 사진을 분석합니다. 키 누락(503), 잘못된 파일(400), 잘못된 키/모델 접근·잔액 부족, 네트워크 지연은 오류 안내로 표시하며 가짜 태그로 대체하지 않습니다. 실제 사진·유효한 키가 필요한 유료 호출과 실제 카메라 동작은 별도 확인해야 합니다.
+
+사진 업로드 바로 아래에 AI 분석 영역을 표시합니다. 업로드·공간 변경·기록 저장 때 다시 표시하며, 실제 사진이 있으면 ‘AI로 문제 확인하기’ 버튼으로 시작합니다. 자동 전송은 하지 않고 동의 후 실행합니다. API 키가 없을 때도 버튼은 표시하되 설정 미완료 사유를 안내합니다.
+
+### 저장된 기록 · 생활 일지
+
+- #archive: 공간별 최신 입주·퇴실 기록, 생활 일지, AI 결과를 유형/검색어로 모아보기. 전체 사진 버전 이력은 아님.
+- #journal: 날짜·제목·분류·공간·진행 상태·내용 작성 및 수정. 최대 100개, 제목 80자, 내용 2,000자. 임시 작성 내용과 완료된 일지는 구분.
+- 로그인한 사용자의 일지와 임시 작성 내용은 기존 D1 workspaces.payload에 계정별 저장. 비회원은 기기 저장. 같은 계정으로 다른 브라우저에 로그인하면 복원. 기존 버전 충돌 보호 유지.
+- HTML 리포트에 저장 완료한 일지도 포함. 발생일/예정일은 사용자 입력이며 시각을 인증하는 기록은 아님.
+- 검증: records-test.cjs와 배포 소스 account-test.mjs, cloud-client-test.mjs로 작성/수정/검색, DB 왕복, 기기간 복원 및 계정 분리 확인. 실제 브라우저 시각 검수는 이 환경에서 미실행.
