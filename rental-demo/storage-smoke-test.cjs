@@ -1,0 +1,6 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+let stored=null,fail=false;
+const db={createObjectStore(){},transaction(){const tx={objectStore(){return {get(){const r={};setImmediate(()=>{r.result=stored;r.onsuccess()});return r;},put(value){setImmediate(()=>{if(fail){fail=false;tx.error=Error('quota');tx.onabort();}else{stored=value;tx.oncomplete();}})}}}};return tx;}};
+const indexedDB={open(){const r={result:db};setImmediate(()=>{r.onupgradeneeded();r.onsuccess()});return r;}};
+const context={window:{indexedDB},indexedDB};vm.createContext(context);vm.runInContext(fs.readFileSync('rental-demo/storage.js','utf8'),context);
+(async()=>{const store=context.window.DepositStore;assert.equal(await store.load(),null);const value={records:{wall:{note:'saved'}}};const first=store.save(value);value.records.wall.note='later';await first;assert.equal((await store.load()).records.wall.note,'saved');await Promise.all([store.save({n:1}),store.save({n:2})]);assert.equal((await store.load()).n,2);fail=true;await assert.rejects(store.save({n:3}));await store.save({n:4});assert.equal((await store.load()).n,4);console.log('PASS local store snapshots, serialized writes, restore, storage failure recovery');})().catch(e=>{console.error(e);process.exitCode=1});
