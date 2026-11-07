@@ -33,11 +33,13 @@ AI 전송 전에 각 패널에서 전송 범위를 확인하고 동의 체크 �
 
 실제 사진이 없으면 사진 분석 버튼을 사용할 수 없습니다. 예시 도식을 실제 분석에 보내지 않습니다. 실패·타임아웃·거절·형식 오류를 표시하며 자동 재시도하지 않습니다. 입력이 바뀌면 이전 응답임을 표시합니다. ‘관찰 명확성’은 모델의 설명이며 검증된 정확도나 확률이 아닙니다.
 
-## 기기 저장과 리포트
+## 로컬 기기 저장과 리포트
+
+이 절은 로컬 Python 서버 기준입니다. 배포 사이트는 로그인 후 계정별 DB·사진 저장을 지원하며 [배포 안내](../DEPLOYMENT.md)를 확인하세요.
 
 - IndexedDB에 사진·메모·특약·AI 응답을 보관합니다. 새로고침 후 같은 브라우저와 같은 주소에서 복원합니다.
 - 저장 오류는 화면 상단에 표시합니다. 중요한 자료는 사진 원본과 HTML 리포트로 따로 보관하세요.
-- 서버는 사용자 자료를 디스크에 저장하지 않으며 요청 본문·사진·키를 로그에 출력하지 않습니다. API 요청에는 `store: false`를 지정하지만 이는 제공자의 모든 데이터 처리·보관 정책을 대신하는 약속이 아닙니다.
+- 로컬 Python 서버는 사용자 자료를 디스크에 저장하지 않으며 요청 본문·사진·키를 로그에 출력하지 않습니다. API 요청에는 `store: false`를 지정하지만 이는 제공자의 모든 데이터 처리·보관 정책을 대신하는 약속이 아닙니다.
 - 브라우저 사이트 데이터 삭제, 시크릿 창 종료, 다른 기기/포트로 접속하면 동일한 기록을 복원하지 못할 수 있습니다.
 - HTML 리포트에는 저장한 사진·메모·기기 등록 시각과 AI 참고 기록이 포함됩니다. 브라우저에서 열어 인쇄/PDF 저장할 수 있습니다.
 - 사진은 공간별·입주/퇴실별 1장, JPG/PNG/WEBP 8MB 이하입니다.
@@ -61,6 +63,7 @@ AI 전송 전에 각 패널에서 전송 범위를 확인하고 동의 체크 �
 ```bash
 python3 -m unittest discover -s rental-demo -p 'test_*.py' -v
 node rental-demo/smoke-test.cjs
+node rental-demo/records-test.cjs
 node rental-demo/ai-smoke-test.cjs
 node rental-demo/photo-flow-test.cjs
 node rental-demo/ai-unconfigured-test.cjs
@@ -76,11 +79,11 @@ node --check rental-demo/storage.js
 
 [OpenAI 이미지 입력](https://developers.openai.com/api/docs/guides/images-vision), [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs), [GPT-4.1 mini](https://developers.openai.com/api/docs/models/gpt-4.1-mini).
 
-## 사진 태그 사용과 GitHub 반영
+## 사진 태그 사용
 
 1. 입주/퇴실 기록에서 공간과 입주/퇴실 구분을 선택합니다.
 2. JPG/PNG/WEBP 사진(8MB 이하)을 등록하고 필요하면 메모를 입력합니다.
-3. 아래 **사진 분석 · 한국어 상태 태그**에서 전송 동의를 체크하고 분석 버튼을 누릅니다.
+3. 사진 아래의 AI 분석 영역에서 전송 동의를 체크하고 분석 버튼을 누릅니다.
 4. 결과의 **AI 상태 태그**와 관찰 근거를 확인합니다. 예: `#긁힘`, `#얼룩`, `#균열`.
 5. 공간 기록을 저장한 뒤 리포트를 내려받으면 AI 태그도 포함됩니다.
 
@@ -88,14 +91,7 @@ node --check rental-demo/storage.js
 
 기존 서버가 키 보관·동일 출처 API·요청 제한을 제공하므로 별도 FastAPI 서버나 패키지를 추가하지 않았습니다. 브라우저는 `/api/analyze`로 사진 data URL을 보내고, Python 서버만 OpenAI Responses API를 호출합니다. 정적 GitHub Pages에서는 이 서버가 실행되지 않습니다.
 
-작업 브랜치에서 검증 후 아래처럼 커밋·푸시하고 GitHub에서 main 대상으로 Pull Request를 엽니다. main에 직접 커밋하거나 푸시하지 않습니다.
-
-```bash
-git switch feat/housing-photo-tags
-git add README.md index.html rental-demo
-git commit -m "feat: add Korean condition tags to photo analysis"
-git push -u origin feat/housing-photo-tags
-```
+팀 작업과 main 반영은 [AGENTS.md](../AGENTS.md)의 공통 규칙을 따릅니다.
 
 실제 연결 확인: 서버를 실행하고 `/api/health`의 `configured`가 true인지 확인한 뒤 위 화면에서 사진을 분석합니다. 키 누락(503), 잘못된 파일(400), 잘못된 키/모델 접근·잔액 부족, 네트워크 지연은 오류 안내로 표시하며 가짜 태그로 대체하지 않습니다. 실제 사진·유효한 키가 필요한 유료 호출과 실제 카메라 동작은 별도 확인해야 합니다.
 
