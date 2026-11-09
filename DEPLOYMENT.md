@@ -4,12 +4,14 @@
 
 Sites로 배포합니다. 현재 접근 범위는 공개(public)이며, 링크가 있는 누구나 웹 화면을 사용할 수 있습니다. 로컬 Python 서버를 켜 두지 않아도 웹 화면을 사용할 수 있습니다.
 
-배포 소스는 `sites/deposit-guardian/`의 별도 Git 저장소에 있습니다. GitHub 프로젝트에 중첩 저장소로 추가하지 않도록 이 경로는 제외합니다. 사이트 소스는 Sites 전용 원격 저장소에 저장됩니다.
+전체 배포 소스는 이 GitHub 저장소의 `sites/deposit-guardian/`에서 함께 관리합니다. 일반 파일로 포함하므로 clone 또는 해당 브랜치를 pull하면 내려받을 수 있습니다. Sites 전용 원격 저장소는 실제 배포 시 별도 체크아웃에서 동기화하며, GitHub push만으로 사이트가 재배포되지는 않습니다.
 
 - `.openai/hosting.json`: 기존 프로젝트 ID를 유지합니다. 같은 사이트를 다시 만들지 않습니다.
 - `app/`: 배포하는 HTML/CSS/JS. 원본 `rental-demo/` 변경을 이 복사본에도 반영합니다.
 - `worker/`: 호스팅용 AI API. 로컬 Python 서버 대신 동작합니다.
-- `node scripts/build.mjs` → `node scripts/test.mjs`로 빌드와 검증을 수행합니다.
+- `cd sites/deposit-guardian` 후 `npm run build` → `npm test`로 빌드와 전체 검증을 수행합니다. Node.js 22.13 이상이 필요하며 Node.js 24 LTS를 권장합니다. 빌드·테스트에는 외부 패키지 설치가 필요하지 않습니다.
+- `db/`, `drizzle/`: DB 스키마와 SQL 마이그레이션. 스키마 변경 시에는 `npm ci` 후 `npm run db:generate`를 사용합니다.
+- 중첩 `.git/`, `dist/`, `node_modules/`, `.env`, 비밀값과 실사용자 데이터는 업로드하지 않습니다.
 - 실제 소스 업로드·아카이브·버전 저장·배포는 Sites 스킬의 source helper와 native tools를 사용합니다.
 
 ## 실제 AI 기능 연결

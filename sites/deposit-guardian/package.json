@@ -1,0 +1,14 @@
+{
+  "name": "deposit-guardian-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/test.mjs && node scripts/account-test.mjs && node scripts/cloud-client-test.mjs",
+    "db:generate": "drizzle-kit generate"
+  },
+  "devDependencies": {
+    "drizzle-kit": "0.31.11",
+    "drizzle-orm": "0.45.4"
+  }
+}

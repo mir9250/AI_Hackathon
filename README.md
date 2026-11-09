@@ -53,3 +53,15 @@ AI 테스트는 모의 응답으로 API 요청·응답 경로를 검증합니다
 공식 분쟁조정 안내: [대한법률구조공단 임대차분쟁조정위원회](https://www.hldcc.or.kr/).
 
 현재 서비스와 시작 화면은 돌려받집으로 통일합니다.
+
+## 배포 소스 공동 개발
+
+실제 Sites 배포용 전체 소스는 [sites/deposit-guardian/](sites/deposit-guardian/)에 포함합니다. 앱 화면, Worker API, DB 스키마·마이그레이션, 빌드·테스트 스크립트를 함께 내려받을 수 있습니다.
+
+```bash
+cd sites/deposit-guardian
+npm run build
+npm test
+```
+
+Node.js 22.13 이상이 필요하며 Node.js 24 LTS를 권장합니다. 위 빌드·테스트는 외부 패키지 설치나 실제 API 키 없이 실행합니다. 로그인·DB·사진 저장의 운영 환경은 Sites 플랫폼이 제공하므로 빌드만으로 로컬에 자동 생성되지는 않습니다. 로컬 화면은 기존 Python 서버로 실행합니다. 자세한 내용은 [배포 소스 안내](sites/deposit-guardian/README.md)를 확인하세요.

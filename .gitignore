@@ -4,5 +4,5 @@ __pycache__/
 .env.*
 !.env.example
 
-# Sites 소스는 별도 원격 저장소에서 관리합니다.
-sites/deposit-guardian/
+# Sites 배포 소스는 추적하되 중첩 Git 정보는 제외합니다.
+sites/deposit-guardian/.git/
