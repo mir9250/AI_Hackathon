@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict';
+import worker from '../dist/server/index.js';
+const url='https://deposit.test';
+const get=path=>new Request(url+path);
+assert.equal((await worker.fetch(get('/'),{})).status,200);
+for(const path of ['/app.js','/ai-ui.js','/storage.js','/style.css'])assert.equal((await worker.fetch(get(path),{})).status,200);
+for(const path of ['/.env','/server.py','/worker/ai-config.json'])assert.equal((await worker.fetch(get(path),{})).status,404);
+const logo=await worker.fetch(get('/logo.png'),{});assert.equal(logo.status,200);assert.equal(logo.headers.get('Content-Type'),'image/png');assert.deepEqual([...new Uint8Array(await logo.arrayBuffer()).slice(0,8)],[137,80,78,71,13,10,26,10]);
+const health=await (await worker.fetch(get('/api/health'),{})).json();assert.equal(health.configured,false);assert.equal(health.hosted,true);
+function post(body,extra={}){return new Request(url+'/api/analyze',{method:'POST',headers:{'Content-Type':'application/json',Origin:url,...extra},body:JSON.stringify(body)});}
+const input={task:'contract',text:'퇴실 청소비 10만원은 임차인이 부담한다.',consent:true};
+assert.equal((await worker.fetch(post({...input,consent:false}),{})).status,400);
+assert.equal((await worker.fetch(post(input,{Origin:'https://other.test'}),{})).status,403);
+assert.equal((await worker.fetch(post(input),{})).status,503);
+assert.equal((await worker.fetch(post(input),{OPENAI_API_KEY:'test-only'})).status,401);
+assert.equal((await worker.fetch(post({task:'photo',images:[],consent:true}),{})).status,400);
+const original=globalThis.fetch;let calls=0;
+const analysis={tags:[],summary:'특약 확인',observations:[{location:'청소',evidence:'퇴실 청소비 10만원',interpretation:'범위 확인 필요',certainty:'보통',category:'특약 확인'}],questions:[],next_steps:[],draft:'확인 요청',limitations:['법률 판단 아님']};
+globalThis.fetch=async(req,options)=>{calls++;const sent=JSON.parse(options.body);assert.equal(sent.store,false);assert.equal(sent.text.format.strict,true);return new Response(JSON.stringify({status:'completed',model:'test-model',output:[{content:[{type:'output_text',text:JSON.stringify(analysis)}]}]}),{status:200});};
+const good=await worker.fetch(post(input,{'oai-authenticated-user-id':'unit-test'}),{OPENAI_API_KEY:'test-only'});assert.equal(good.status,200);assert.equal((await good.json()).analysis.summary,'특약 확인');
+for(const tags of [['긁힘','긁힘'],['허용되지 않은 태그'],['긁힘','찍힘','균열','들뜸','변색','얼룩','물자국']]){analysis.tags=tags;assert.equal((await worker.fetch(post(input,{'oai-authenticated-user-id':'unit-test'}),{OPENAI_API_KEY:'test-only'})).status,502);}analysis.tags=[];
+analysis.observations[0].evidence='원문에 없는 조항';assert.equal((await worker.fetch(post(input,{'oai-authenticated-user-id':'unit-test'}),{OPENAI_API_KEY:'test-only'})).status,502);
+assert.equal(calls,5);globalThis.fetch=original;
+console.log('PASS hosted assets, missing-key mode, identity/consent/origin/input gates, provider payload, result validation');

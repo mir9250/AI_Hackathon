@@ -1,0 +1,12 @@
+import fs from 'node:fs/promises';
+const names=['index.html','app.js','style.css','ai-ui.js','storage.js','logo.png','account.js','records.js'];
+const assets=Object.fromEntries(await Promise.all(names.map(async name=>['/'+name,name.endsWith('.png')?{base64:(await fs.readFile(new URL('../app/'+name,import.meta.url))).toString('base64'),type:'image/png'}:await fs.readFile(new URL('../app/'+name,import.meta.url),'utf8')])));
+const ai=JSON.parse(await fs.readFile(new URL('../worker/ai-config.json',import.meta.url),'utf8'));
+let source=await fs.readFile(new URL('../worker/index.mjs',import.meta.url),'utf8');
+source=source.replace('/* ACCOUNT_API */',await fs.readFile(new URL('../worker/accounts.mjs',import.meta.url),'utf8'));
+source=source.replace('/* BUILD_DATA */',`const ASSETS=${JSON.stringify(assets)};\nconst AI=${JSON.stringify(ai)};`);
+await fs.mkdir(new URL('../dist/server/',import.meta.url),{recursive:true});
+await fs.mkdir(new URL('../dist/.openai/',import.meta.url),{recursive:true});
+await fs.writeFile(new URL('../dist/server/index.js',import.meta.url),source);
+await fs.copyFile(new URL('../.openai/hosting.json',import.meta.url),new URL('../dist/.openai/hosting.json',import.meta.url));
+console.log('Built embedded Worker with 8 assets and AI API routes');
