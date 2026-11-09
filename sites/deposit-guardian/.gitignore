@@ -2,3 +2,7 @@ dist/
 .env
 .env.*
 node_modules/
+
+.local-state/
+.dev.vars
+.dev.vars.*

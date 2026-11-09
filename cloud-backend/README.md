@@ -1,6 +1,7 @@
 # 계정 저장 API 참고본
 
-실제 배포 소스는 이 GitHub 저장소의 `sites/deposit-guardian/`에 포함되어 있습니다. 이 폴더는 팀원이 검토·이식할 수 있는 서버 로직 및 생성된 스키마 참고본입니다. accounts.mjs는 Worker의 json, headers, check, AI 전역과 함께 번들링하며 독립 실행용 서버가 아닙니다.
+실제 배포 소스는 이 GitHub 저장소의 `sites/deposit-guardian/`에 포함되어 있습니다. 이 폴더는 서버 로직 및 스키마 참고본이며 독립 서버가 아닙니다. 실행 환경과 검증 결과는 [REPRODUCIBILITY.md](REPRODUCIBILITY.md)를 확인하세요.
+
 
 인증은 Sites의 검증된 oai-authenticated-user-id/email 헤더만 사용합니다. 일반 인터넷 서버로 이식할 때는 클라이언트 헤더를 신뢰하면 안 되며, 팀의 실제 세션 검증 결과로 대체해야 합니다.
 

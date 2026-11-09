@@ -1,5 +1,7 @@
 # 돌려받집 배포 관리
 
+> 이슈 #1 후속: 실제 소스는 GitHub에서 확보했습니다. 로컬 D1/R2 실행·Worker 통합 테스트는 [REPRODUCIBILITY.md](cloud-backend/REPRODUCIBILITY.md)를 따르세요. 아래 운영 기록은 이번에 재배포하거나 운영 데이터로 재검증한 결과가 아닙니다. Sites 메타데이터 조회는 성공했으나 운영 버전↔소스 SHA와 운영 R2 공개 설정은 아직 확인하지 못했습니다.
+
 배포 주소: https://dollyeobatjip-demo.newflask.chatgpt.site
 
 Sites로 배포합니다. 현재 접근 범위는 공개(public)이며, 링크가 있는 누구나 웹 화면을 사용할 수 있습니다. 로컬 Python 서버를 켜 두지 않아도 웹 화면을 사용할 수 있습니다.

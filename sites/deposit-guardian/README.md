@@ -2,6 +2,20 @@
 
 Sites에서 사용하는 앱 화면, Cloudflare Worker API, 계정·사진 저장 로직, DB 스키마·마이그레이션 및 테스트를 팀 GitHub에서 함께 관리합니다. 이 폴더는 일반 소스 디렉터리이며 별도 Git 저장소나 submodule이 아닙니다.
 
+## 로컬 D1·R2와 실제 Worker 실행
+
+팀 재현 절차·인증 경계·기준 소스·검증 제한은 [REPRODUCIBILITY.md](../../cloud-backend/REPRODUCIBILITY.md)를 확인하세요. Node 22.16.0에서 검증했으며 `.nvmrc`와 lockfile을 사용합니다.
+
+```sh
+npm ci
+npm run db:local
+npm run dev:local
+# 별도 터미널: 전체 기존 테스트 + 실제 workerd/D1/R2 검증
+npm run test:all
+```
+
+서버는 `http://127.0.0.1:8787/`, 로컬 데이터는 Git 제외 `.local-state/`입니다. 일반 로컬 서버는 비로그인만 지원하며 위조 신원 헤더를 제거합니다. 계정 테스트는 난수 토큰으로 격리된 fixture에서 수행합니다. 외부 fetch는 차단하고 실키/.env를 읽지 않습니다. `local/config.json`은 비밀값 없는 로컬 설정입니다.
+
 ## 빌드와 검증
 
 Node.js 22.13 이상이 필요하며 Node.js 24 LTS를 권장합니다. 이 디렉터리에서 실행합니다.
@@ -11,7 +25,7 @@ npm run build
 npm test
 ```
 
-빌드와 테스트는 Node.js 내장 기능만 사용하므로 외부 패키지 설치 없이 실행할 수 있습니다. 빌드 결과는 dist/server/index.js이며 Git에서 제외합니다. 테스트는 정적 자산, AI 입력·응답 검증과 모의 호출, SQLite 기반 계정 분리·DB 왕복, 클라이언트 동기화·충돌 처리를 확인합니다. 실제 사용자 로그인·카메라·유료 AI 호출은 별도 검증이 필요합니다.
+기존 빌드와 `npm test`는 Node.js 내장 기능만 사용합니다. 새 로컬 D1/R2 실행 및 `test:runtime`/`test:all`에는 위의 `npm ci`가 필요합니다. 빌드 결과는 dist/server/index.js이며 Git에서 제외합니다. 테스트는 정적 자산, AI 입력·응답 검증과 모의 호출, SQLite 기반 계정 분리·DB 왕복, 클라이언트 동기화·충돌 처리를 확인합니다. 실제 사용자 로그인·카메라·유료 AI 호출은 별도 검증이 필요합니다.
 
 스키마를 수정하여 마이그레이션을 생성할 때만 npm ci 후 npm run db:generate를 실행합니다.
 
