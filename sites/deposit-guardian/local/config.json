@@ -1,6 +1,0 @@
-{
-  "compatibilityDate": "2025-07-18",
-  "port": 8787,
-  "databaseId": "deposit-guardian-local",
-  "bucketBinding": "BUCKET"
-}
