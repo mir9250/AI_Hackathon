@@ -135,6 +135,24 @@ function start() {
 
   function renderAccount() {
     view.innerHTML = `<section id="account-view" hidden>${accountMarkup(profile, house)}<h2>나의 기록</h2><p>아래에서 저장된 입실·퇴실 사진과 계약서를 조회할 수 있어요.</p><button id="record-entry">입실 기록 보기</button> <button id="record-exit">퇴실 기록 보기</button> <button id="record-contract">계약서 보기</button> <button id="record-living">거주 중 기록 보기</button></section><section id="home-heading" class="section-heading"><h1>살 때부터 나갈 때까지,<br>돌려받집과 함께.</h1><p>오늘 남긴 기록으로 내일의 보증금을 준비하세요.</p><button id="setup-house" class="quiet">나의 집 등록·관리</button></section>` + `<nav class="photo-nav"><button id="open-photos" ${house ? '' : 'disabled'}>입실 사진 등록·조회</button><button id="open-living">거주 중 문제 대처</button><button id="open-moveout" ${house ? '' : 'disabled'}>퇴실 사진 등록·비교</button><button id="open-contracts" ${house ? '' : 'disabled'}>계약서 분석</button></nav><div id="living-view" hidden></div><div id="photos-view" hidden></div><div id="moveout-view" hidden></div><div id="contracts-view" hidden></div>`;
+    const navigation = view.querySelector('.photo-nav');
+    const launcher = document.createElement('section');
+    launcher.className = 'record-launcher';
+    launcher.setAttribute('aria-label', '기록 메뉴 찾기');
+    launcher.innerHTML = `<div class="search-pill"><span aria-hidden="true">⌕</span><label class="sr-only" for="record-search">기록 메뉴 검색</label><input id="record-search" type="search" placeholder="어떤 기록을 남길까요?" autocomplete="off"><button id="clear-record-search" class="quiet" type="button" aria-label="검색어 지우기">×</button></div><p id="record-search-empty" class="hint" hidden>일치하는 메뉴가 없습니다. 입실, 거주, 퇴실, 계약서를 검색해 보세요.</p>`;
+    launcher.append(navigation);
+    view.prepend(launcher);
+    const search = launcher.querySelector('#record-search');
+    const filterMenus = () => {
+      let count = 0;
+      for (const button of navigation.querySelectorAll('button')) {
+        button.hidden = !button.textContent.includes(search.value.trim());
+        if (!button.hidden) count++;
+      }
+      launcher.querySelector('#record-search-empty').hidden = count > 0;
+    };
+    search.oninput = filterMenus;
+    launcher.querySelector('#clear-record-search').onclick = () => { search.value = ''; filterMenus(); search.focus(); };
     const toggleAccount = () => {
       const account = document.querySelector('#account-view');
       account.hidden = !account.hidden;
