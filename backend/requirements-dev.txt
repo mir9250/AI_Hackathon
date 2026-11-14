@@ -1,0 +1,3 @@
+-r requirements.txt
+pytest==9.0.1
+pglast==8.8

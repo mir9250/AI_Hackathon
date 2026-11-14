@@ -1,8 +1,19 @@
-__pycache__/
-*.py[cod]
+.venv/
+.tools/
+**/__pycache__/
+.pytest_cache/
 .env
 .env.*
 !.env.example
+**/node_modules/
+**/dist/
+.DS_Store
+*.log
 
-# Sites 배포 소스는 추적하되 중첩 Git 정보는 제외합니다.
-sites/deposit-guardian/.git/
+# Team repository and local safety exclusions
+*.py[cod]
+**/.git/
+*.pem
+*.key
+*.p12
+*.pfx
