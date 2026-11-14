@@ -1,0 +1,14 @@
+fastapi==0.121.3
+uvicorn==0.38.0
+httpx==0.28.1
+pydantic==2.14.3
+pydantic-settings==2.12.0
+PyJWT==2.10.1
+
+Pillow==13.0.0
+pillow-heif==1.8.1
+python-multipart==0.0.33
+pypdf==7.1.0
+
+# Adobe-Korea1 CID-to-Unicode fallback for contract PDF evidence only.
+pdfminer.six==20260107

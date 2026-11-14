@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<body>
+    <h2>API 통신 실습</h2>
+
+    <button id="getBtn">백엔드 메시지 가져오기</button>
+    <p id="getResult"></p>
+
+    <hr>
+
+    <input id="textInput" placeholder="메시지를 입력하세요">
+    <button id="postBtn">백엔드로 전송</button>
+    <p id="postResult"></p>
+
+    <script>
+        // GET 요청
+        document.getElementById("getBtn").onclick = async function() {
+            const response = await fetch("/api/hello");
+            const data = await response.json();
+
+            document.getElementById("getResult").innerText = data.message;
+        };
+
+        // POST 요청
+        document.getElementById("postBtn").onclick = async function() {
+            const text = document.getElementById("textInput").value;
+
+            const response = await fetch("/api/echo", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({text: text})
+            });
+
+            const data = await response.json();
+
+            document.getElementById("postResult").innerText = data.reply;
+        };
+    </script>
+</body>
+</html>
