@@ -11,7 +11,7 @@ export function mountMoveOut(root, api, signal) {
   const e = escapeHtml;
   root.innerHTML = `<section class="card photo-section"><span class="step">퇴실 기록</span><h2>퇴실 사진 등록</h2>
     <p>입실 사진 하나를 선택하고 같은 위치의 퇴실 사진을 등록하세요. 입실 사진당 한 장만 연결할 수 있습니다.</p>
-    <div id="exit-entry-list" class="photo-grid"></div>
+    <aside class="notice"><strong>입실 사진과 이렇게 비교해요</strong><p>같은 위치·거리·각도로 촬영하세요. 벽지 얼룩과 들뜸, 바닥 긁힘, 창틀·실리콘의 변화를 살펴봅니다. 조명이나 가구 배치가 다르면 비교가 어려울 수 있어요.</p></aside><div id="exit-entry-list" class="photo-grid"></div>
     <form id="exit-upload-form"><p id="exit-location" class="hint">비교할 입실 사진을 선택해 주세요.</p>
       <label for="exit-file">퇴실 사진 (한 장, 최대 20MiB)</label>
       <input id="exit-file" type="file" accept=".jpg,.jpeg,.png,.heic,.webp">

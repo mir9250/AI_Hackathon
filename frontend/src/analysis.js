@@ -26,7 +26,7 @@ export function analysisMarkup(photo, working = false, localError = '', comparis
     return `<section class="analysis-result"><h4>${e(LABELS[record?.overall_result] || '분석 결과')}</h4>
       ${record?.overall_result === 'none' ? '<p>사진에서 뚜렷한 의심 흔적을 발견하지 못했습니다.</p>' : record?.overall_result === 'no_visible_change' ? '<p>두 사진에서 눈에 띄는 새로운 변화를 발견하지 못했습니다.</p>' : ''}
       ${((comparison ? record?.changes : record?.damages) || []).map((damage) => `<article class="damage-finding"><h5>${e(damage.type)}</h5>
-        <p>${e(damage.status)}</p><p>${e(damage.description)}</p><p><strong>권장 조치</strong> ${e(damage.recommendation)}</p></article>`).join('')}
+        <p>${e(damage.status)}</p><p><strong>${comparison ? '입실 대비 변화' : '관찰 내용'}</strong> ${e(damage.description)}</p><p><strong>권장 조치</strong> ${e(damage.recommendation)}</p></article>`).join('')}
       <p class="hint">AI 참고 정보입니다. 손상 원인이나 법적 책임을 확정하지 않습니다.</p></section>`;
   }
   const error = localError || (state === 'failed' ? ERRORS[record?.error_code] || '분석에 실패했습니다. 다시 시도하거나 서버 설정을 확인해 주세요.' : '');

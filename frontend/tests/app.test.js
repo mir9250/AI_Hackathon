@@ -30,7 +30,7 @@ async function setup({ signupSession = null, initialSession = null } = {}) {
   globalThis.fetch = async (url, options) => {
     assert.equal(options.headers.Authorization, `Bearer ${session.access_token}`);
     calls.push([url,options.method]);
-    if (url.endsWith('/contracts')) return Response.json({ data: [] });
+    if (url.endsWith('/contracts') || url.endsWith('/living-records')) return Response.json({ data: [] });
     if (url.endsWith('/move-in/photos') || url.endsWith('/move-out/photos')) return Response.json({ data: [] });
     const kind = url.endsWith('/profile') ? 'profile' : 'house';
     if (options.method === 'PUT') {
@@ -168,4 +168,22 @@ test('contract menu is gated on house and logout clears contract documents', asy
     assert.match(document.querySelector('#contracts-view').textContent,/외부 AI 전송에 동의/);
     await app.auth.signOut();assert.equal(document.querySelector('#contract-files'),null);
   } finally {app.close();}
+});
+
+test('mypage opens separately and living guide sits between entry and exit', async () => {
+  const app = await setup({ initialSession: { access_token: 'test', user: { id: 'user-A' } } });
+  try {
+    await settle();
+    assert.equal(document.querySelector('#account-view').hidden, true);
+    document.querySelector('#mypage').click();
+    assert.equal(document.querySelector('#account-view').hidden, false);
+    assert.equal(document.querySelector('#home-heading').hidden, true);
+    assert.deepEqual([...document.querySelector('.photo-nav').children].slice(0,3).map(b => b.id), ['open-photos','open-living','open-moveout']);
+    document.querySelector('#open-living').click();
+    assert.equal(document.querySelector('#living-view').hidden, false);
+    assert.ok(document.querySelector('#living-description'));
+    await app.auth.signOut();
+    assert.equal(document.querySelector('#mypage').hidden, true);
+    assert.equal(document.querySelector('#living-view'), null);
+  } finally { app.close(); }
 });

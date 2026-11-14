@@ -224,7 +224,7 @@ def test_cors_authorization_preflight(system):
 def test_only_current_api_routes_exist(system):
     client, _ = system
     paths = client.get('/openapi.json').json()['paths']
-    assert set(paths) == {'/api/photos/{photo_id}', '/api/health', '/api/profile', '/api/house', '/api/move-in/photos', '/api/photos/{photo_id}/analyze', '/api/move-out/photos', '/api/move-out/photos/{photo_id}/compare', '/api/contracts', '/api/contracts/{id}', '/api/contracts/{id}/pdf', '/api/contracts/{id}/pages', '/api/contracts/{id}/complete', '/api/contracts/{id}/analyze'}
+    assert set(paths) == {'/api/living-records', '/api/photos/{photo_id}', '/api/health', '/api/profile', '/api/house', '/api/move-in/photos', '/api/photos/{photo_id}/analyze', '/api/move-out/photos', '/api/move-out/photos/{photo_id}/compare', '/api/contracts', '/api/contracts/{id}', '/api/contracts/{id}/pdf', '/api/contracts/{id}/pages', '/api/contracts/{id}/complete', '/api/contracts/{id}/analyze'}
 
 
 def test_bad_upstream_ownership_is_not_exposed(system):

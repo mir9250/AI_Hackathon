@@ -24,7 +24,7 @@ export function mountPhotos(root, api, signal) {
   const analyzing = new Set();
   const analysisErrors = new Map();
   root.innerHTML = `<section class="card photo-section"><span class="step">입실 기록</span>
-    <h2>입실 사진 등록</h2><p>사진은 한 번에 최대 10장, 장당 20MiB까지 등록할 수 있습니다. JPG·PNG·HEIC·WEBP를 지원합니다.</p>
+    <h2>입실 사진 등록</h2><details class="shoot-guide" open><summary>어디를 어떻게 찍어야 하나요?</summary><ul><li>벽·벽지: 방 전체와 모서리, 얼룩·들뜸·찢어진 부분</li><li>바닥: 방 전체와 긁힘·찍힘·변색된 부분</li><li>천장·창틀: 물자국, 틈새, 결로 흔적</li><li>욕실·주방: 타일, 실리콘, 싱크대 아래와 배관 주변</li><li>문·수납장·옵션: 문틀과 손잡이, 가전 외관과 작동 상태</li></ul><p>장소마다 전체 사진 한 장과 가까이 찍은 사진을 남기세요. 원본과 촬영 날짜를 보관하고, 퇴실 때 같은 위치·각도·조명으로 다시 찍으면 비교하기 좋아요.</p></details><p>사진은 한 번에 최대 10장, 장당 20MiB까지 등록할 수 있습니다. JPG·PNG·HEIC·WEBP를 지원합니다.</p>
     <p class="hint">가상 사진으로 테스트하세요. AI 분석 버튼을 누르면 사진이 외부 OpenAI 서비스로 전송되며 API 사용료가 발생할 수 있습니다.</p>
     <label for="photo-files">사진 선택</label><input id="photo-files" type="file" multiple accept=".jpg,.jpeg,.png,.heic,.webp">
     <p id="photo-message" role="status" aria-live="polite"></p>

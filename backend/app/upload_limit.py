@@ -16,7 +16,7 @@ class UploadLimitMiddleware:
     async def __call__(self, scope, receive, send):
         if scope['type'] != 'http':
             return await self.app(scope, receive, send)
-        file_route = scope['path'] in {'/api/move-in/photos', '/api/move-out/photos'} or re.fullmatch(r'/api/contracts/[^/]+/(pdf|pages)', scope['path'])
+        file_route = scope['path'] in {'/api/move-in/photos', '/api/move-out/photos', '/api/living-records'} or re.fullmatch(r'/api/contracts/[^/]+/(pdf|pages)', scope['path'])
         if scope['method'] != 'POST' or not file_route:
             return await self.app(scope, receive, send)
         limit = 21 * 1024 * 1024  # 20MiB file + bounded multipart overhead

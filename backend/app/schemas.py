@@ -261,3 +261,18 @@ class ContractAnalysisRecord(BaseModel):
             ContractAnalysisResult(document_quality=self.document_quality,summary=self.summary,
                 findings=self.findings,checklist=self.checklist,warnings=self.warnings)
         return self
+
+
+class LivingRecord(BaseModel):
+    photo_id: UUID
+    house_id: UUID
+    category: Literal['mold', 'wall', 'other']
+    description: str
+    original_path: str
+    preview_path: str | None = None
+    mime_type: str
+    size_bytes: int
+    upload_id: UUID
+    created_at: datetime
+    signed_url: str
+    signed_url_expires_at: datetime

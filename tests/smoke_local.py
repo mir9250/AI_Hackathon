@@ -37,7 +37,7 @@ def main():
                     with urllib.request.urlopen(url, timeout=1) as response:
                         body = response.read().decode()
                         assert response.status == 200
-                        assert ('"status":"ok"' in body if label == 'uvicorn' else '보증금 지킴이' in body)
+                        assert ('"status":"ok"' in body if label == 'uvicorn' else '돌려받집' in body)
                         print(f'{label}: HTTP 200, local process smoke test passed')
                         break
                 except (OSError, TimeoutError):

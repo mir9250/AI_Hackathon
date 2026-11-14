@@ -1,7 +1,7 @@
 import logging
 import asyncio
 from uuid import UUID
-from typing import Annotated
+from typing import Annotated, Literal
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
@@ -25,6 +25,8 @@ from .contract_analysis import ContractAnalysisService
 from .schemas import ContractAnalyzeInput, ContractAnalysisRecord
 from .schemas import (ContractCreateInput, ContractCompleteInput, ContractRecord, ContractDetail, ContractFileResult)
 from .deletion import DeletionService
+from .schemas import LivingRecord
+from .living import LivingService
 from .photos import PhotoService
 from .upload_limit import UploadLimitMiddleware
 
@@ -113,6 +115,26 @@ def create_app(settings: Settings, transport: httpx.AsyncBaseTransport | None = 
     @app.put("/api/house", response_model=DataResponse[House])
     async def put_house(body: HouseInput, user: Identity = Depends(identity), service=Depends(gateway)):
         return {"data": await service.record("houses", user.user_id, user.token, body.model_dump())}
+
+    @app.get("/api/living-records", response_model=DataResponse[list[LivingRecord]])
+    async def list_living(request: Request, user: Identity = Depends(identity), service=Depends(gateway)):
+        return {"data": await LivingService(service, request.app.state.photo_lock).listing(user)}
+
+    @app.post("/api/living-records", response_model=DataResponse[PhotoUploadResult])
+    async def upload_living(request: Request,
+                            file: Annotated[UploadFile, File()],
+                            category: Annotated[Literal['mold', 'wall', 'other'], Form()],
+                            description: Annotated[str, Form(min_length=1, max_length=2000)],
+                            upload_id: Annotated[UUID, Form()],
+                            user: Identity = Depends(identity), service=Depends(gateway)):
+        try:
+            description = description.strip()
+            if not description:
+                raise ApiError(422, 'VALIDATION_ERROR', '발견한 위치와 상황을 입력해 주세요.')
+            return {"data": await LivingService(service, request.app.state.photo_lock).upload(
+                user, file, category, description, upload_id)}
+        finally:
+            await file.close()
 
     @app.post("/api/move-in/photos", response_model=DataResponse[PhotoUploadResult])
     async def upload_move_in(request: Request,

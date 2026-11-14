@@ -2,11 +2,12 @@ import { createApi } from './api.js';
 import { mountContracts } from './contracts.js';
 import { mountMoveOut } from './moveout.js';
 import { mountPhotos } from './photos.js';
+import { mountLiving } from './living.js';
 import { accountMarkup } from './ui.js';
 
 export function mountApp(root, env, createClient) {
-root.innerHTML = `<header><a class="brand" href="#">▧ <span>보증금 지킴이</span></a>
-  <span class="header-note">안심할 수 있는 집의 시작</span><button id="logout" class="quiet" hidden>로그아웃</button></header>
+root.innerHTML = `<header><a class="brand" href="#"><img src="/logo.png" alt="" class="brand-logo"> <span>돌려받집</span></a>
+  <span class="header-note">안심할 수 있는 집의 시작</span><button id="mypage" class="quiet" hidden>마이페이지</button><button id="logout" class="quiet" hidden>로그아웃</button></header>
   <main><div id="message" role="status" aria-live="polite"></div>
   <p id="slow" class="notice" hidden>서버를 깨우고 있습니다. 첫 연결에는 시간이 걸릴 수 있습니다.</p>
   <div id="view"></div></main><footer>내 집의 상태를 기록하고, 보증금을 지키는 첫걸음.<br>
@@ -54,8 +55,11 @@ function start() {
   let disposePhotos;
   let disposeMoveOut;
   let disposeContracts;
+  let disposeLiving;
 
   function invalidate() {
+    disposeLiving?.();
+    disposeLiving = undefined;
     disposeContracts?.();
     disposeContracts = undefined;
     disposeMoveOut?.();
@@ -73,6 +77,7 @@ function start() {
     profile = house = null;
     invalidate();
     logout.hidden = true;
+    document.querySelector('#mypage').hidden = true;
     view.innerHTML = `<div class="auth-layout"><section class="intro"><span class="eyebrow">DEPOSIT GUARDIAN</span>
       <h1>소중한 보증금,<br>기록으로 지켜요.</h1><p>계약부터 퇴실까지.<br>나의 집을 위한 꼼꼼한 준비를 시작하세요.</p>
       <div class="home-symbol" aria-hidden="true">⌂</div><span class="intro-caption">오늘의 기록이 내일의 안심으로</span></section>
@@ -129,8 +134,28 @@ function start() {
   }
 
   function renderAccount() {
-    view.innerHTML = accountMarkup(profile, house) + `<nav class="photo-nav"><button id="open-photos" ${house ? '' : 'disabled'}>입실 사진 등록·조회</button><button id="open-moveout" ${house ? '' : 'disabled'}>퇴실</button><button id="open-contracts" ${house ? '' : 'disabled'}>계약서 분석</button></nav><div id="photos-view" hidden></div><div id="moveout-view" hidden></div><div id="contracts-view" hidden></div>`;
+    view.innerHTML = `<section id="account-view" hidden>${accountMarkup(profile, house)}<h2>나의 기록</h2><p>아래에서 저장된 입실·퇴실 사진과 계약서를 조회할 수 있어요.</p><button id="record-entry">입실 기록 보기</button> <button id="record-exit">퇴실 기록 보기</button> <button id="record-contract">계약서 보기</button> <button id="record-living">거주 중 기록 보기</button></section><section id="home-heading" class="section-heading"><h1>살 때부터 나갈 때까지,<br>돌려받집과 함께.</h1><p>오늘 남긴 기록으로 내일의 보증금을 준비하세요.</p><button id="setup-house" class="quiet">나의 집 등록·관리</button></section>` + `<nav class="photo-nav"><button id="open-photos" ${house ? '' : 'disabled'}>입실 사진 등록·조회</button><button id="open-living">거주 중 문제 대처</button><button id="open-moveout" ${house ? '' : 'disabled'}>퇴실 사진 등록·비교</button><button id="open-contracts" ${house ? '' : 'disabled'}>계약서 분석</button></nav><div id="living-view" hidden></div><div id="photos-view" hidden></div><div id="moveout-view" hidden></div><div id="contracts-view" hidden></div>`;
+    const toggleAccount = () => {
+      const account = document.querySelector('#account-view');
+      account.hidden = !account.hidden;
+      document.querySelector('#home-heading').hidden = !account.hidden;
+      for (const id of ['photos', 'moveout', 'contracts', 'living']) document.querySelector(`#${id}-view`).hidden = true;
+      document.querySelector('#mypage').setAttribute('aria-expanded', String(!account.hidden));
+    };
+    document.querySelector('#mypage').onclick = toggleAccount;
+    document.querySelector('#setup-house').onclick = toggleAccount;
+    for (const [id, target] of [['entry','photos'],['exit','moveout'],['contract','contracts'],['living','living']]) {
+      document.querySelector(`#record-${id}`).onclick = () => document.querySelector(`#open-${target}`).click();
+    }
+    document.querySelector('#open-living').onclick = () => {
+      for (const id of ['photos','moveout','contracts']) document.querySelector(`#${id}-view`).hidden = true;
+      const target = document.querySelector('#living-view');
+      target.hidden = false;
+      if (!disposeLiving) disposeLiving = mountLiving(target, api, controller.signal);
+      else target.dispatchEvent(new window.Event('refresh-living'));
+    };
     document.querySelector('#open-photos').onclick = () => {
+      document.querySelector('#living-view').hidden = true;
       document.querySelector('#contracts-view').hidden = true;
       document.querySelector('#moveout-view').hidden = true;
       const target = document.querySelector('#photos-view');
@@ -139,6 +164,7 @@ function start() {
       document.querySelector('#open-photos').textContent = target.hidden ? '입실 사진 등록·조회' : '사진 화면 접기';
     };
     document.querySelector('#open-moveout').onclick = () => {
+      document.querySelector('#living-view').hidden = true;
       document.querySelector('#contracts-view').hidden = true;
       document.querySelector('#photos-view').hidden = true;
       const target = document.querySelector('#moveout-view');
@@ -148,6 +174,7 @@ function start() {
       document.querySelector('#open-photos').textContent = '입실 사진 등록·조회';
     };
     document.querySelector('#open-contracts').onclick = () => {
+      document.querySelector('#living-view').hidden = true;
       document.querySelector('#photos-view').hidden = true;
       document.querySelector('#moveout-view').hidden = true;
       const target = document.querySelector('#contracts-view');
@@ -207,6 +234,7 @@ function start() {
   supabase.auth.onAuthStateChange((event, session) => {
     if (!session) { authView(); return; }
     logout.hidden = false;
+    document.querySelector('#mypage').hidden = false;
     if (userId !== session.user.id) {
       userId = session.user.id;
       notify('');
