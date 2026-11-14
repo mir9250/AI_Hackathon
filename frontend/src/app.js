@@ -5,7 +5,7 @@ import { mountPhotos } from './photos.js';
 import { mountLiving } from './living.js';
 import { accountMarkup } from './ui.js';
 
-export function mountApp(root, env, createClient) {
+export function mountApp(root, env, createClient, apiOverride = null) {
 root.innerHTML = `<header><a class="brand" href="#"><img src="/logo.png" alt="" class="brand-logo"> <span>돌려받집</span></a>
   <span class="header-note">안심할 수 있는 집의 시작</span><button id="mypage" class="quiet" hidden>마이페이지</button><button id="logout" class="quiet" hidden>로그아웃</button></header>
   <main><div id="message" role="status" aria-live="polite"></div>
@@ -45,7 +45,7 @@ function start() {
   const supabase = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_PUBLISHABLE_KEY, {
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
   });
-  const api = createApi({ baseUrl: env.VITE_API_BASE_URL.replace(/\/$/, ''), auth: supabase.auth,
+  const api = apiOverride || createApi({ baseUrl: env.VITE_API_BASE_URL.replace(/\/$/, ''), auth: supabase.auth,
     onSlow: (slow) => { document.querySelector('#slow').hidden = !slow; } });
   let userId = null;
   let generation = 0;
