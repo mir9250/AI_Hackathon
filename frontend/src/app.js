@@ -2,6 +2,7 @@ import { createApi } from './api.js';
 import { mountContracts } from './contracts.js';
 import { mountMoveOut } from './moveout.js';
 import { mountPhotos } from './photos.js';
+import { mountHomeCare } from './home-care.js';
 import { mountLiving } from './living.js';
 import { accountMarkup } from './ui.js';
 
@@ -135,6 +136,7 @@ function start() {
 
   function renderAccount() {
     view.innerHTML = `<section id="account-view" hidden>${accountMarkup(profile, house)}<h2>나의 기록</h2><p>아래에서 저장된 입실·퇴실 사진과 계약서를 조회할 수 있어요.</p><button id="record-entry">입실 기록 보기</button> <button id="record-exit">퇴실 기록 보기</button> <button id="record-contract">계약서 보기</button> <button id="record-living">거주 중 기록 보기</button></section><section id="home-heading" class="section-heading"><h1>살 때부터 나갈 때까지,<br>돌려받집과 함께.</h1><p>오늘 남긴 기록으로 내일의 보증금을 준비하세요.</p><button id="setup-house" class="quiet">나의 집 등록·관리</button></section>` + `<nav class="photo-nav"><button id="open-photos" ${house ? '' : 'disabled'}>입실 사진 등록·조회</button><button id="open-living">거주 중 문제 대처</button><button id="open-moveout" ${house ? '' : 'disabled'}>퇴실 사진 등록·비교</button><button id="open-contracts" ${house ? '' : 'disabled'}>계약서 분석</button></nav><div id="living-view" hidden></div><div id="photos-view" hidden></div><div id="moveout-view" hidden></div><div id="contracts-view" hidden></div>`;
+    mountHomeCare(view);
     const navigation = view.querySelector('.photo-nav');
     const launcher = document.createElement('section');
     launcher.className = 'record-launcher';
