@@ -23,3 +23,15 @@ test('static assets are served and unknown routes return 404',async()=>{
  assert.equal(await (await worker.fetch(new Request('https://site.example/'))).text(),'hello');
  assert.equal((await worker.fetch(new Request('https://site.example/missing'))).status,404);
 });
+test('only public legal GET routes pass without a token; private and write routes stay protected',async()=>{
+ let calls=0;
+ const worker=createWorker({},async()=>{calls++;return Response.json({data:{total:120}});});
+ for(const path of ['/api/legal/cases?q=수선','/api/legal/cases/case-98gahap44951']){
+  assert.equal((await worker.fetch(new Request('https://site.example'+path))).status,200);
+ }
+ assert.equal(calls,2);
+ for(const [path,method] of [['/api/legal/cases','POST'],['/api/legal/cases','DELETE'],['/api/legal/cases/private/extra','GET'],['/api/profile','GET'],['/api/legal/cases-other','GET']]){
+  assert.equal((await worker.fetch(new Request('https://site.example'+path,{method}))).status,401);
+ }
+ assert.equal(calls,2);
+});

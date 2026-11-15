@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { mountApp } from './app.js';
 import './style.css';
+import './legal.css';
 import { createSupabaseAccountApi } from './supabase-account.js';
 import { mountPreview } from './preview.js';
 
