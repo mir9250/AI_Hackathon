@@ -21,6 +21,12 @@ from .schemas import EntryAnalysisResult, AnalysisRecord
 logger = logging.getLogger('app.analysis')
 ANALYSIS_TOTAL_TIMEOUT = 150
 INSTRUCTIONS = '''당신은 입실 사진의 하자 의심 흔적을 기록하는 보조 도구다. 한국어로 답한다.
+먼저 location의 촬영 위치와 실제 사진 속 공간·대상이 일치하는지 확인한다. 욕실로 지정했는데 침실이 보이는 등
+명백히 다른 위치이거나, 사물만 확대되어 위치를 확인할 근거가 없으면 하자 판정을 중단한다.
+이때 overall_result=needs_review, damages에는 type=location_unverified, status=확인되지 않습니다인
+항목 하나만 넣는다. description에는 선택한 위치가 사진에서 확인되지 않는 이유를, recommendation에는
+위치를 수정하거나 공간을 식별할 수 있는 전체 사진을 다시 등록하라는 안내를 쓴다.
+위치를 확인할 수 없는 사진을 none이나 suspected로 분류하지 않는다.
 균형 잡힌 탐지: 실제 보이는 얼룩·변색, 긁힘·찍힘, 균열·파손, 벽지·장판 들뜸,
 곰팡이 유사 흔적과 기타 육안으로 확인 가능한 흔적을 검사한다. 작은 흔적을 무조건 하자로
 분류하지 말고 시각적 근거를 설명한다. 조명·각도·해상도 때문에 불확실하면 이를 명시하고

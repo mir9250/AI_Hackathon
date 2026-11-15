@@ -187,3 +187,22 @@ test('mypage opens separately and living guide sits between entry and exit', asy
     assert.equal(document.querySelector('#living-view'), null);
   } finally { app.close(); }
 });
+
+test('brand returns to home and questions do not filter record navigation', async () => {
+  const app = await setup({ initialSession: { access_token: 'restored', user: { id: 'A' } } });
+  try {
+    window.scrollTo = () => {};
+    document.querySelector('#mypage').click();
+    assert.equal(document.querySelector('#account-view').hidden, false);
+    document.querySelector('.brand img').click();
+    await settle();
+    assert.equal(document.querySelector('#account-view').hidden, true);
+    assert.equal(document.querySelector('#home-heading').hidden, false);
+    const question = document.querySelector('.record-launcher .home-care input');
+    assert.ok(question);
+    question.value = '곰팡이가 생겼어요';
+    question.dispatchEvent(new window.Event('input'));
+    assert.equal(document.querySelectorAll('.photo-nav button[hidden]').length, 0);
+    assert.ok(document.querySelector('.community'));
+  } finally { app.close(); }
+});
