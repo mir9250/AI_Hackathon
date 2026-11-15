@@ -1,0 +1,11 @@
+{
+  "dataset_id": "dollyeobatjip-rental-law-seed",
+  "version": "0.1.0",
+  "records": 15,
+  "sha256": {
+    "rental-law.json": "b08ea00cb9c75b8a59dd26ee28da8d5275b60a7875dab123bf234a738d18d4fd",
+    "rental-law.jsonl": "2e9f6d264aceadda6a4db80dcb4180ef9d98ae37decc6f28bc5213701f2bc9c8",
+    "rental-law.csv": "604611eafa8acc9c372f45ddc6bdc6c0d5bc4a0328ed3ca0db9c8d55b2dbbb9a",
+    "README.md": "ee9703d992a002dc6cfc8a70bc539e3bb42772e9cee4df2ffcc74037dcdd6c54"
+  }
+}
