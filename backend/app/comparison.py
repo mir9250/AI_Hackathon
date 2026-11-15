@@ -4,6 +4,12 @@ from .errors import ApiError
 from .schemas import ComparisonResult, ComparisonRecord
 
 COMPARISON_INSTRUCTIONS = '''당신은 입실·퇴실 사진을 비교하는 관찰 보조 도구다. 한국어로 답한다.
+먼저 두 사진 각각이 location에 지정된 촬영 위치인지, 동일한 공간·대상을 비교하는지 확인한다.
+다른 공간이거나 위치를 확인할 근거가 부족하면 비교를 중단한다. overall_result=needs_review로,
+changes에는 type=location_unverified, status=확인되지 않습니다인 항목 하나만 넣는다.
+description에는 위치가 확인되지 않는 이유를, recommendation에는 촬영 위치를 수정하거나
+동일한 공간을 식별할 수 있는 전체 사진을 다시 등록하라는 안내를 쓴다.
+이 경우 no_visible_change나 change_suspected로 분류하지 않는다.
 입실 사진은 첫 번째, 퇴실 사진은 두 번째다. 같은 위치에서 입실 당시 보이지 않았으나 퇴실 당시
 새롭게 나타난 긁힘·균열·얼룩·찍힘·파손·들뜸·변색 등 손상 의심 흔적을 찾는다.
 입실 당시 이미 보이던 흔적을 새 손상으로 분류하지 않는다. 촬영 각도·거리·그림자·조명·화질

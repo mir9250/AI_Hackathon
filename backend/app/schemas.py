@@ -75,6 +75,9 @@ class EntryAnalysisResult(BaseModel):
 
     @model_validator(mode='after')
     def consistent_findings(self):
+        if any(item.type == 'location_unverified' for item in self.damages):
+            self.overall_result = 'needs_review'
+            self.damages = [item for item in self.damages if item.type == 'location_unverified']
         if self.overall_result == 'none' and self.damages:
             raise ValueError('none must have no findings')
         if self.overall_result == 'suspected' and not self.damages:
@@ -107,6 +110,9 @@ class ComparisonResult(BaseModel):
 
     @model_validator(mode='after')
     def consistent_changes(self):
+        if any(item.type == 'location_unverified' for item in self.changes):
+            self.overall_result = 'needs_review'
+            self.changes = [item for item in self.changes if item.type == 'location_unverified']
         if self.overall_result == 'no_visible_change' and self.changes:
             raise ValueError('no_visible_change must have no findings')
         if self.overall_result == 'change_suspected' and not self.changes:

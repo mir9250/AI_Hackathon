@@ -20,3 +20,17 @@ select{font:inherit;width:100%;padding:12px;border:1px solid #d6dfd7;border-radi
 
 /* Softer yellow accents and the home-care question area. */
 button,.record-launcher .photo-nav button{background:#FFE79A;border-color:#efda96}button:hover,.record-launcher .photo-nav button:hover{background:#FFDE7C}.home-care{max-width:850px;margin:36px auto 0;padding:28px;border:1px solid #eee9db;background:#fff}.home-care h2{font-size:22px;margin:8px 0 12px}.care-input{display:flex;gap:10px;align-items:center}.care-input input{border-radius:26px;background:#fffefb}.care-input button{width:auto;white-space:nowrap;margin:0;border-radius:26px;padding:13px 22px}.care-suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.care-suggestions button{background:#fffaf0;border-color:#eee4ca;font-size:12px;padding:8px 12px;border-radius:18px}.care-answer{background:#fffaf0;border-radius:14px;padding:18px;margin-top:20px}.care-answer h3{font-size:16px;margin:0 0 8px}.care-answer p{font-size:14px;line-height:1.9;margin:0}@media(max-width:520px){.home-care{padding:22px}.care-input{flex-direction:column;align-items:stretch}.care-input button{width:100%}}
+
+/* Question-first home and shared discussion. */
+.record-launcher .home-care{margin-top:0;max-width:none}
+.care-answer a{color:#765c13;text-underline-offset:3px;overflow-wrap:anywhere}
+.care-answer li{margin:8px 0;font-size:14px}
+.community{margin:36px auto;max-width:850px;overflow-wrap:anywhere}
+.community textarea{display:block;width:100%;min-height:100px;padding:12px;border:1px solid #ddd;border-radius:10px;font:inherit;resize:vertical}
+.community article{padding:20px 0;border-top:1px solid #eee}
+.community article p{white-space:pre-wrap}
+.community form{margin:16px 0}
+.community form button{width:auto;margin-top:12px}
+.community h3{margin:10px 0}
+.community small{color:#777}
+@media(max-width:520px){.community{padding:20px}.community button{max-width:100%}.care-answer{padding:14px}}

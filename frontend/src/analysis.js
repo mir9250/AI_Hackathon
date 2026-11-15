@@ -22,10 +22,12 @@ export function analysisMarkup(photo, working = false, localError = '', comparis
   const state = record?.status || (comparison ? photo.comparison_status : photo.analysis_status);
   const stale = state === 'analyzing' && (!record?.started_at || Date.now() - Date.parse(record.started_at) >= 180000);
   const inProgress = working || (state === 'analyzing' && !stale);
+  const findings = (comparison ? record?.changes : record?.damages) || [];
+  const unverified = findings.some(item => item.type === 'location_unverified');
   if (state === 'completed') {
-    return `<section class="analysis-result"><h4>${e(LABELS[record?.overall_result] || '분석 결과')}</h4>
-      ${record?.overall_result === 'none' ? '<p>사진에서 뚜렷한 의심 흔적을 발견하지 못했습니다.</p>' : record?.overall_result === 'no_visible_change' ? '<p>두 사진에서 눈에 띄는 새로운 변화를 발견하지 못했습니다.</p>' : ''}
-      ${((comparison ? record?.changes : record?.damages) || []).map((damage) => `<article class="damage-finding"><h5>${e(damage.type)}</h5>
+    return `<section class="analysis-result"><h4>${e(unverified ? '촬영 위치가 확인되지 않습니다' : LABELS[record?.overall_result] || '분석 결과')}</h4>
+      ${!unverified && record?.overall_result === 'none' ? '<p>사진에서 뚜렷한 의심 흔적을 발견하지 못했습니다.</p>' : !unverified && record?.overall_result === 'no_visible_change' ? '<p>두 사진에서 눈에 띄는 새로운 변화를 발견하지 못했습니다.</p>' : ''}
+      ${findings.filter(item => !unverified || item.type === 'location_unverified').map((damage) => `<article class="damage-finding"><h5>${e(damage.type === 'location_unverified' ? '사진과 촬영 위치를 확인해 주세요' : damage.type)}</h5>
         <p>${e(damage.status)}</p><p><strong>${comparison ? '입실 대비 변화' : '관찰 내용'}</strong> ${e(damage.description)}</p><p><strong>권장 조치</strong> ${e(damage.recommendation)}</p></article>`).join('')}
       <p class="hint">AI 참고 정보입니다. 손상 원인이나 법적 책임을 확정하지 않습니다.</p></section>`;
   }

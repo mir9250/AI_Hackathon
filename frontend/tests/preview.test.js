@@ -12,12 +12,12 @@ test('published preview opens dashboard without network or false save success', 
     await new Promise(resolve => setTimeout(resolve, 50));
     assert.match(document.querySelector('.preview-banner').textContent, /미리보기/);
     assert.equal(document.querySelector('#view').firstElementChild.className, 'record-launcher');
-    const search = document.querySelector('#record-search');
-    search.value = '퇴실'; search.oninput();
-    assert.equal(document.querySelector('#open-photos').hidden, true);
-    assert.equal(document.querySelector('#open-moveout').hidden, false);
-    document.querySelector('#clear-record-search').click();
+    const search = document.querySelector('.home-care input');
+    search.value = '퇴실';
+    search.closest('form').dispatchEvent(new dom.window.Event('submit', { cancelable: true }));
+    assert.equal(document.querySelector('.care-answer').hidden, false);
     assert.equal(document.querySelector('#open-photos').hidden, false);
+    assert.equal(document.querySelector('#open-moveout').hidden, false);
     document.querySelector('#mypage').click();
     assert.equal(document.querySelector('#account-view').hidden, false);
     await document.querySelector('#profile-form').onsubmit({ preventDefault() {}, currentTarget: document.querySelector('#profile-form') });
