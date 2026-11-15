@@ -1,4 +1,4 @@
-:root{font-family:'Noto Sans KR',sans-serif;color:#1e3532;background:#f5f6f2;font-synthesis:none;line-height:1.6}
+:root{font-family:Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',system-ui,sans-serif;color:#1e3532;background:#f5f6f2;font-synthesis:none;line-height:1.7;word-break:keep-all}
 *{box-sizing:border-box}body{margin:0}button,input{font:inherit}button,a{-webkit-tap-highlight-color:transparent}
 header{max-width:1200px;margin:auto;padding:26px 40px;display:flex;align-items:center;gap:24px;border-bottom:1px solid #dce4dd}
 .brand{display:flex;gap:12px;align-items:center;color:#143e39;font-size:23px;font-weight:800;text-decoration:none;letter-spacing:-1px}.header-note{margin-left:auto;color:#74847e;font-size:13px}

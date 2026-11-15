@@ -11,7 +11,9 @@ export function createWorker(assets, upstreamFetch = fetch) {
         const origin = request.headers.get('origin');
         if (origin && origin !== url.origin) return error(403,'FORBIDDEN','이 사이트에서 요청해 주세요.');
         const auth = request.headers.get('authorization');
-        if (url.pathname !== '/api/health' && !auth?.startsWith('Bearer ')) return error(401,'AUTH_REQUIRED','로그인 후 이용해 주세요.');
+         const publicRead = request.method === 'GET' &&
+           (url.pathname === '/api/health' || /^\/api\/legal\/cases(?:\/[A-Za-z0-9_-]+)?$/.test(url.pathname));
+         if (!publicRead && !auth?.startsWith('Bearer ')) return error(401,'AUTH_REQUIRED','로그인 후 이용해 주세요.');
         if (Number(request.headers.get('content-length')) > LIMIT) return error(422,'IMAGE_SIZE_LIMIT','파일은 20MiB 이하로 하나씩 전송해 주세요.');
         const headers = new Headers();
         for (const name of ['authorization','content-type','accept']) {

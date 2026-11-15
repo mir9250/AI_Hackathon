@@ -1,3 +1,5 @@
+import { mountLegalLibrary } from './legal.js';
+
 // Official source summaries reviewed 2026-11-16. These are conditional guides, not fault statistics.
 const SOURCES = {
   repair: { label: '생활법령정보 · 임대인의 수선의무', url: 'https://easylaw.go.kr/CSP/CnpClsMain.laf?ccfNo=4&cciNo=2&cnpClsNo=2&csmSeq=629&popMenu=ov' },
@@ -85,7 +87,7 @@ export function answerHomeCare(question) {
   if (!matches.length) return { title: '어떤 상황인지 조금 더 알려주세요', text: '집 관리와 임대차에 관한 기본 안내를 제공합니다. “비가 오면 천장에 물이 새요”, “퇴실 때 도배비를 요구해요”처럼 위치·증상·발생 시점을 적어 주세요.', questions: [], sources: [] };
   return { ...matches[0].item, related: matches.slice(1,3).map(match => match.item.title), ...evaluateFacts(matches[0].item, normalized) };
 }
-export function mountHomeCare(root) {
+export function mountHomeCare(root, legalOptions = {}) {
   const section = document.createElement('section');
   section.className = 'home-care card';
   section.innerHTML = `<span class="step">집 관리 질문</span><h2>집 관리, 궁금한 점이 있나요?</h2><p class="hint">상황을 검색하면 공식 자료를 바탕으로 확인할 조건과 다음 행동을 안내해요. 질문은 저장·전송되지 않습니다.</p><form><label class="sr-only" for="care-question">집 관리 질문</label><div class="care-input"><input id="care-question" type="search" maxlength="500" required placeholder="예: 환기해도 창틀에 곰팡이가 생겨요"><button type="submit">답변 보기</button></div></form><div class="care-suggestions"><button type="button">곰팡이가 생겼어요</button><button type="button">벽지가 들떴어요</button><button type="button">보증금을 안 돌려줘요</button></div><div class="care-answer" role="status" aria-live="polite" hidden></div>`;
@@ -115,5 +117,6 @@ export function mountHomeCare(root) {
   section.querySelector('form').onsubmit = event => { event.preventDefault(); show(); };
   section.querySelectorAll('.care-suggestions button').forEach(button => { button.onclick = () => { input.value = button.textContent; show(); }; });
   root.append(section);
-  return section;
+  const disposeLegal = mountLegalLibrary(section, legalOptions);
+  return () => { disposeLegal(); section.remove(); };
 }

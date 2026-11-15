@@ -22,6 +22,7 @@ export function mountPreview(root) {
     return [];
   };
   mountApp(root, {
+    VITE_UI_PREVIEW: 'true',
     VITE_API_BASE_URL: 'https://preview.invalid',
     VITE_SUPABASE_URL: 'https://preview.invalid',
     VITE_SUPABASE_PUBLISHABLE_KEY: 'preview-only',

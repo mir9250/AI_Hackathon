@@ -58,9 +58,12 @@ function start() {
   let disposeMoveOut;
   let disposeContracts;
   let disposeLiving;
+  let disposeHomeCare;
   let disposeCommunity;
 
   function invalidate() {
+    disposeHomeCare?.();
+    disposeHomeCare = undefined;
     disposeCommunity?.();
     disposeCommunity = undefined;
     disposeLiving?.();
@@ -145,7 +148,8 @@ function start() {
     const launcher = document.createElement('section');
     launcher.className = 'record-launcher';
     launcher.setAttribute('aria-label', '집 관리 질문과 기록');
-    mountHomeCare(launcher);
+    disposeHomeCare?.();
+    disposeHomeCare = mountHomeCare(launcher, { baseUrl: env.VITE_UI_PREVIEW === 'true' ? '' : env.VITE_API_BASE_URL });
     launcher.append(navigation);
     view.prepend(launcher);
     disposeCommunity?.();

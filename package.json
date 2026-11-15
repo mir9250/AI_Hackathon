@@ -1,0 +1,6 @@
+{
+  "name": "dollyeobatjip-preview",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "node scripts/dev-preview.mjs" }
+}

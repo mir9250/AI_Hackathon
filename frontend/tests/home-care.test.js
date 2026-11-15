@@ -8,6 +8,19 @@ test('home-care guide routes relevant questions and gives honest fallback', () =
   assert.match(answerHomeCare('벽지 훼손').title, /벽지/);
   assert.match(answerHomeCare('주식 추천').text, /기본 안내/);
 });
+test('legal case search lives inside home care and is removed with the guide', () => {
+  const dom = new JSDOM('<main></main>');
+  const old = globalThis.document; globalThis.document = dom.window.document;
+  try {
+    const root = document.querySelector('main');
+    const dispose = mountHomeCare(root);
+    assert.equal(root.querySelectorAll('.legal-library').length, 1);
+    assert.equal(root.querySelector('.legal-library').parentElement, root.querySelector('.home-care'));
+    assert.match(root.querySelector('.legal-library summary').textContent, /임대차 판례 찾아보기/);
+    dispose();
+    assert.equal(root.querySelector('.home-care'), null);
+  } finally { dom.window.close(); globalThis.document = old; }
+});
 test('question form and suggestions show safe local guidance', () => {
   const dom = new JSDOM('<main></main>');
   const old = globalThis.document; globalThis.document = dom.window.document;

@@ -29,6 +29,7 @@ from .schemas import LivingRecord
 from .living import LivingService
 from .photos import PhotoService
 from .upload_limit import UploadLimitMiddleware
+from .legal import router as legal_router
 
 bearer = HTTPBearer(auto_error=False)
 
@@ -66,7 +67,8 @@ def create_app(settings: Settings, transport: httpx.AsyncBaseTransport | None = 
 
     app = FastAPI(title="보증금 지킴이 API", version="0.2.0", lifespan=lifespan,
                   responses={status: {"model": ErrorResponse} for status in
-                             (401, 403, 404, 409, 422, 500, 502, 503, 504)})
+                              (401, 403, 404, 409, 422, 500, 502, 503, 504)})
+    app.include_router(legal_router)
 
     @app.exception_handler(ApiError)
     async def api_error_handler(request, exc):
