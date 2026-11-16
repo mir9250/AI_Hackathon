@@ -40,7 +40,7 @@ export function contractAnalysisMarkup(contract,{working=false,consent=false,err
   const running=working||(result?.status==='analyzing'&&!stale);
   const message=error||(result?.status==='failed'?(errors[result.error_code]||'분석에 실패했습니다. 오류 설정과 원본을 확인한 뒤 다시 시도해 주세요.'):'');
   return `<section class="card photo-section contract-analysis"><h3>계약서 AI 분석</h3>
-    <p>등록한 ${contract.source_type==='pdf'?'PDF 전체':'모든 이미지 페이지'}가 외부 OpenAI API로 전송됩니다. 이름·주소·연락처·계좌번호 등이 포함될 수 있으며 API 비용이 발생할 수 있습니다.</p>
+    <p>등록한 ${contract.source_type==='pdf'?'PDF 전체':'모든 이미지 페이지'}가 분석을 위해 외부 OpenAI API로 전송돼요. 이름·주소·연락처·계좌번호 같은 개인정보가 함께 전송될 수 있어요.</p>
     <label class="confirmation"><input id="contract-ai-consent" type="checkbox" ${consent?'checked':''} ${running?'disabled':''}>계약서 전체를 외부 OpenAI API로 전송하여 분석하는 데 동의합니다.</label>
     <p id="contract-ai-status" role="status" aria-live="polite">${running?'계약서 전체를 분석하고 있습니다…':stale?'이전 작업이 3분 이상 정체되었습니다. 다시 시도할 수 있습니다.':e(message||'미분석')}</p>
     <ul>${(result?.warnings||[]).map((warning)=>`<li>${e(warning)}</li>`).join('')}</ul>

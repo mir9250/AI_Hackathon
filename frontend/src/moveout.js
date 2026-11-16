@@ -19,7 +19,7 @@ export function mountMoveOut(root, api, signal) {
       <p id="exit-upload-message" role="status" aria-live="polite"></p>
       <button id="exit-upload" type="submit" disabled>퇴실 사진 업로드</button></form></section>
     <section class="photo-section"><div class="photo-heading"><h2>입실·퇴실 비교</h2><button id="refresh-exits" class="quiet">다시 조회</button></div>
-    <p class="hint">AI 비교 시 두 사진이 OpenAI로 전송되고 API 비용이 발생할 수 있습니다. 결과는 참고 정보이며 원인·책임을 확정하지 않습니다.</p>
+    <p class="hint">AI 비교를 누르면 두 사진이 분석을 위해 외부 AI 서비스(OpenAI)로 전송돼요. 결과는 참고용이며 손상 원인이나 책임을 확정하지 않아요.</p>
     <p id="exit-list-message" role="status" aria-live="polite"></p><div id="exit-pairs"></div></section>`;
   const find = (id) => root.querySelector(`#${id}`);
   const message = (text) => { if (alive) find('exit-upload-message').textContent = text; };
