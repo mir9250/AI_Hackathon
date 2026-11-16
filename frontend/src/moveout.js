@@ -13,7 +13,7 @@ export function mountMoveOut(root, api, signal) {
     <p>입실 사진 하나를 선택하고 같은 위치의 퇴실 사진을 등록하세요. 입실 사진당 한 장만 연결할 수 있습니다.</p>
     <aside class="notice"><strong>입실 사진과 이렇게 비교해요</strong><p>같은 위치·거리·각도로 촬영하세요. 벽지 얼룩과 들뜸, 바닥 긁힘, 창틀·실리콘의 변화를 살펴봅니다. 조명이나 가구 배치가 다르면 비교가 어려울 수 있어요.</p></aside><div id="exit-entry-list" class="photo-grid"></div>
     <form id="exit-upload-form"><p id="exit-location" class="hint">비교할 입실 사진을 선택해 주세요.</p>
-      <label for="exit-file">퇴실 사진 (한 장, 최대 20MiB)</label>
+      <label for="exit-file">퇴실 사진 (한 장, 최대 20MB)</label>
       <input id="exit-file" type="file" accept=".jpg,.jpeg,.png,.heic,.webp">
       <img id="exit-preview" class="exit-preview" hidden alt="선택한 퇴실 사진">
       <p id="exit-upload-message" role="status" aria-live="polite"></p>
@@ -69,7 +69,7 @@ export function mountMoveOut(root, api, signal) {
       finally{deleting.delete(id);if(alive)renderPairs();}
     };});
     root.querySelectorAll('#exit-pairs img, #exit-entry-list img').forEach((img) => {
-      img.onerror = () => { if (alive) find('exit-list-message').textContent = '사진 주소가 만료되었거나 연결에 실패했습니다. 다시 조회해 주세요.'; };
+      img.onerror = () => { if (alive) find('exit-list-message').textContent = '사진을 불러오지 못했어요. 새로고침해 주세요.'; };
     });
     root.querySelectorAll('[data-compare]').forEach((button) => {
       button.onclick = async () => {
@@ -101,7 +101,7 @@ export function mountMoveOut(root, api, signal) {
       [entries, exits] = values;
       lastLoaded = Date.now();
       renderEntries(); renderPairs();
-      find('exit-list-message').textContent = !entries.length ? '먼저 입실 사진을 등록해 주세요.' : !exits.length ? '아직 등록된 퇴실 사진이 없습니다.' : '저장된 사진과 비교 결과입니다. 주소가 만료되면 다시 조회해 주세요.';
+      find('exit-list-message').textContent = !entries.length ? '먼저 입실 사진을 등록해 주세요.' : !exits.length ? '아직 등록된 퇴실 사진이 없습니다.' : '저장된 사진과 비교 결과예요. 사진이 안 보이면 새로고침해 주세요.';
     } catch (error) {
       if (alive && error.name !== 'AbortError') find('exit-list-message').textContent = error.message;
     } finally { loading = false; if (alive) ready(); }

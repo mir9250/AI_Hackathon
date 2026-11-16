@@ -17,7 +17,7 @@ export function mountContracts(root, api, signal) {
     <p id="contract-message" role="status" aria-live="polite"></p><div id="contract-list" class="contract-list"></div></section>
     <section class="card photo-section"><h3 id="contract-heading">새 계약서 등록</h3>
     <label for="contract-source">등록 방식</label><select id="contract-source"><option value="pdf">PDF 1개 (최대 20페이지)</option><option value="images">계약서 사진 (최대 10페이지)</option></select>
-    <form id="contract-upload-form"><label for="contract-files">파일 선택 (파일당 최대 20MiB)</label>
+    <form id="contract-upload-form"><label for="contract-files">파일 선택 (파일당 최대 20MB)</label>
       <input id="contract-files" type="file" accept=".pdf"><p class="hint">사진은 업로드 전에 순서를 조정하세요. 저장된 페이지는 교체할 수 없습니다.</p>
       <div id="contract-pending" class="photo-grid"></div><button id="upload-contract" type="submit" disabled>파일 업로드</button></form>
     <label class="confirmation"><input id="confirm-contract-pages" type="checkbox">계약서의 전체 페이지를 빠짐없이 업로드했는지 직접 확인했습니다.</label>
@@ -76,7 +76,7 @@ export function mountContracts(root, api, signal) {
     if(!selected){find('contract-detail').innerHTML='';controls();return;}
     find('contract-source').value=selected.source_type;
     find('contract-detail').innerHTML=`<h3>저장된 계약서</h3><button type="button" id="delete-contract" class="quiet" ${busy||analyzing?'disabled':''}>${busy?'삭제/저장 처리 중…':selected.upload_status==='deleting'?'계약서 삭제 재시도':'계약서 삭제'}</button><p>${e(STATES[selected.upload_status])} · ${e(koreanTime(selected.created_at))} · ${e(selected.house.name)}</p>
-      <p>${selected.analysis_status==='not_analyzed'?'미분석':`분석 상태: ${e(selected.analysis_status)}`} </p>
+      <p>${selected.analysis_status==='not_analyzed'?'미분석':`분석 상태: ${e({analyzing:'분석 중',completed:'분석 완료',failed:'분석 실패'}[selected.analysis_status]||'확인 중')}`} </p>
       ${selected.upload_status==='ready'?'<p class="notice">등록이 완료되었습니다. 페이지를 추가하거나 파일을 교체할 수 없습니다.</p>':''}
       ${selected.signed_url?`<a class="quiet" href="${e(selected.signed_url)}" target="_blank" rel="noopener noreferrer">PDF 원본 열기 (${selected.page_count}페이지)</a>`:''}
       <div class="photo-grid">${(selected.pages||[]).map((page)=>`<article class="photo-card" id="contract-page-${page.page_number}"><h4>${page.page_number}페이지</h4>
@@ -113,7 +113,7 @@ export function mountContracts(root, api, signal) {
       }catch(error){if(alive&&error.name!=='AbortError'){analysisError=error.message;notify(error.message);}}
       finally{analyzing=false;if(alive){renderDetail();await refresh();controls();}}
     };
-    root.querySelectorAll('#contract-detail img').forEach((img)=>{img.onerror=()=>notify('표시 주소가 만료되었거나 연결에 실패했습니다. 다시 조회해 주세요.');});
+    root.querySelectorAll('#contract-detail img').forEach((img)=>{img.onerror=()=>notify('파일을 불러오지 못했어요. 새로고침해 주세요.');});
     controls();
   }
 
@@ -170,11 +170,11 @@ export function mountContracts(root, api, signal) {
     clearPending();
     const free=Array.from({length:10},(_,index)=>index+1).filter((number)=>!occupied.has(number));
     pending=files.map((file,index)=>{
-      const checked=isImages()?validatePhotoFile(file):{mime:'application/pdf',error:!file.name.toLowerCase().endsWith('.pdf')||(file.type&&file.type!=='application/pdf')?'PDF 파일만 선택해 주세요.':!file.size||file.size>LIMIT?'PDF는 0바이트 초과, 20MiB 이하여야 합니다.':''};
+      const checked=isImages()?validatePhotoFile(file):{mime:'application/pdf',error:!file.name.toLowerCase().endsWith('.pdf')||(file.type&&file.type!=='application/pdf')?'PDF 파일만 선택해 주세요.':!file.size||file.size>LIMIT?'PDF는 20MB 이하만 올릴 수 있어요.':''};
       return {file,...checked,page_number:isImages()?free[index]:null,preview:checked.error?'':URL.createObjectURL(file),done:false,attempted:false};
     });
     find('confirm-contract-pages').checked=false;
-    renderPending();notify(isImages()?'페이지 번호와 순서를 확인하세요. 업로드가 시작되면 번호·순서는 고정됩니다.':'PDF는 서버에서 암호화·손상·최대 20페이지 여부를 검사합니다.');
+    renderPending();notify(isImages()?'페이지 번호와 순서를 확인하세요. 업로드가 시작되면 번호·순서는 고정됩니다.':'암호가 걸려 있거나 손상된 PDF, 20페이지가 넘는 PDF는 등록할 수 없어요.');
   };
   find('contract-upload-form').onsubmit=async(event)=>{
     event.preventDefault();

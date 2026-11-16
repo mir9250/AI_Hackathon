@@ -139,7 +139,7 @@ test('comparison failure keeps retry control and does not claim no visible chang
     assert.match(app.root.textContent,/AI 비교 다시 시도/);
     assert.doesNotMatch(app.root.textContent,/눈에 띄는 변화 없음/);
     await app.remount();
-    assert.match(app.root.textContent,/크레딧/);
+    assert.match(app.root.textContent,/AI 기능을 잠시 사용할 수 없어요/);
   } finally {app.close();}
 });
 
@@ -147,5 +147,5 @@ test('no-visible-change result is completed and stale comparison can retry',()=>
   const none=comparisonMarkup({photo_id:'x',comparison:{status:'completed',overall_result:'no_visible_change',changes:[]}});
   assert.match(none,/눈에 띄는 변화 없음/); assert.doesNotMatch(none,/data-compare/);
   const stale=comparisonMarkup({photo_id:'x',comparison:{status:'analyzing',started_at:'2000-01-01T00:00:00Z'}});
-  assert.match(stale,/3분 이상/); assert.doesNotMatch(stale,/disabled/);
+  assert.match(stale,/오래 멈춰 있어요/); assert.doesNotMatch(stale,/disabled/);
 });

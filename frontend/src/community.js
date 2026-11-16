@@ -1,7 +1,7 @@
 const PAGE = 20;
 const messageFor = error => ['42P01', 'PGRST205'].includes(error?.code)
-  ? '커뮤니티 저장소가 아직 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.'
-  : '요청을 처리하지 못했습니다. 로그인 상태와 연결을 확인하고 다시 시도해 주세요.';
+  ? '지금은 커뮤니티를 사용할 수 없어요. 잠시 후 다시 시도해 주세요.'
+  : '요청을 처리하지 못했어요. 로그인 상태와 인터넷 연결을 확인하고 다시 시도해 주세요.';
 const element = (tag, text, className) => {
   const node = document.createElement(tag); node.textContent = text;
   if (className) node.className = className;

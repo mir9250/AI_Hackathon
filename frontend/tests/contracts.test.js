@@ -214,6 +214,6 @@ test('unreadable contract shows failure guidance and retry without fabricated su
     assert.match(app.root.textContent,/2페이지를 선명하게 다시 등록/);
     assert.match(app.root.textContent,/다시 시도/);
     assert.doesNotMatch(app.root.textContent,/① 계약서 주요 정보/);
-    await app.remount();assert.match(app.root.textContent,/판독하지 못했습니다/);
+    await app.remount();assert.match(app.root.textContent,/글자를 읽지 못했어요/);
   }finally{app.close();}
 });

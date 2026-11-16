@@ -1,14 +1,14 @@
 import { escapeHtml } from './ui.js';
 const e=escapeHtml;
-const errors={AI_DAILY_LIMIT:'오늘의 공통 AI 호출 한도에 도달했습니다. 한국 시간 다음 날 다시 이용해 주세요.',
-  AI_CONTRACT_UNREADABLE:'계약서를 판독하지 못했습니다. 아래 경고를 확인하고 선명한 전체 페이지를 새 계약서로 등록해 주세요.',
-  AI_EVIDENCE_UNAVAILABLE:'서버에서 원문을 추출하지 못해 인용문을 검증할 수 없습니다. 텍스트 추출이 가능한 PDF로 다시 등록해 주세요.',
-  AI_EVIDENCE_MISMATCH:'AI 인용문과 원문 페이지를 대조하지 못해 결과를 저장하지 않았습니다.',
-  AI_PAGE_RANGE:'AI가 등록 범위를 벗어난 페이지를 반환해 결과를 저장하지 않았습니다.',
-  AI_CREDIT_REQUIRED:'OpenAI API 크레딧과 결제 한도를 확인해 주세요.',AI_AUTH_ERROR:'백엔드 OpenAI API 키를 확인해 주세요.',
-  AI_TIMEOUT:'계약서 분석 시간이 초과되었습니다. 저장된 원본으로 다시 시도할 수 있습니다.',
-  AI_STALE:'이전 분석이 중단되었습니다. 저장된 계약서로 다시 시도할 수 있습니다.',
-  AI_INVALID_RESPONSE:'AI 응답 형식이 올바르지 않아 저장하지 않았습니다.'};
+const errors={AI_DAILY_LIMIT:'오늘 사용할 수 있는 AI 분석 횟수를 모두 사용했어요. 내일 다시 이용해 주세요.',
+  AI_CONTRACT_UNREADABLE:'계약서 글자를 읽지 못했어요. 아래 안내를 확인하고 모든 페이지를 선명하게 다시 등록해 주세요.',
+  AI_EVIDENCE_UNAVAILABLE:'계약서 글자를 읽지 못해 분석 결과를 확인할 수 없어요. 글자를 선택할 수 있는 PDF로 다시 등록해 주세요.',
+  AI_EVIDENCE_MISMATCH:'AI 분석 내용을 계약서 원문과 맞춰 보지 못해 결과를 저장하지 않았어요. 다시 시도해 주세요.',
+  AI_PAGE_RANGE:'AI 분석 결과에 오류가 있어 저장하지 않았어요. 다시 시도해 주세요.',
+  AI_CREDIT_REQUIRED:'AI 기능을 잠시 사용할 수 없어요. 잠시 후 다시 시도해 주세요.',AI_AUTH_ERROR:'AI 기능을 잠시 사용할 수 없어요. 잠시 후 다시 시도해 주세요.',AI_PERMISSION_ERROR:'AI 기능을 잠시 사용할 수 없어요. 잠시 후 다시 시도해 주세요.',AI_MODEL_UNAVAILABLE:'AI 기능을 잠시 사용할 수 없어요. 잠시 후 다시 시도해 주세요.',AI_SETUP_REQUIRED:'AI 기능을 잠시 사용할 수 없어요. 잠시 후 다시 시도해 주세요.',AI_NOT_CONFIGURED:'AI 기능을 잠시 사용할 수 없어요. 잠시 후 다시 시도해 주세요.',AI_UNAVAILABLE:'AI 기능을 잠시 사용할 수 없어요. 잠시 후 다시 시도해 주세요.',AI_RATE_LIMIT:'AI 기능을 잠시 사용할 수 없어요. 잠시 후 다시 시도해 주세요.',AI_SERVICE_ERROR:'AI 기능을 잠시 사용할 수 없어요. 잠시 후 다시 시도해 주세요.',
+  AI_TIMEOUT:'계약서 분석이 오래 걸려 멈췄어요. 다시 시도해 주세요.',
+  AI_STALE:'이전 분석이 중간에 멈췄어요. 다시 시도해 주세요.',
+  AI_INVALID_RESPONSE:'AI 분석 결과를 정리하지 못했어요. 다시 시도해 주세요.'};
 const money=(value)=>value==null?'확인 불가':Number(value).toLocaleString('ko-KR')+'원';
 const value=(text)=>e(text??'확인 불가');
 
@@ -38,11 +38,11 @@ export function contractAnalysisMarkup(contract,{working=false,consent=false,err
   }
   const stale=result?.status==='analyzing'&&(!result.started_at||Date.now()-Date.parse(result.started_at)>=180000);
   const running=working||(result?.status==='analyzing'&&!stale);
-  const message=error||(result?.status==='failed'?(errors[result.error_code]||'분석에 실패했습니다. 오류 설정과 원본을 확인한 뒤 다시 시도해 주세요.'):'');
+  const message=error||(result?.status==='failed'?(errors[result.error_code]||'분석하지 못했어요. 계약서 원본을 확인한 뒤 다시 시도해 주세요.'):'');
   return `<section class="card photo-section contract-analysis"><h3>계약서 AI 분석</h3>
     <p>등록한 ${contract.source_type==='pdf'?'PDF 전체':'모든 이미지 페이지'}가 분석을 위해 외부 OpenAI API로 전송돼요. 이름·주소·연락처·계좌번호 같은 개인정보가 함께 전송될 수 있어요.</p>
     <label class="confirmation"><input id="contract-ai-consent" type="checkbox" ${consent?'checked':''} ${running?'disabled':''}>계약서 전체를 외부 OpenAI API로 전송하여 분석하는 데 동의합니다.</label>
-    <p id="contract-ai-status" role="status" aria-live="polite">${running?'계약서 전체를 분석하고 있습니다…':stale?'이전 작업이 3분 이상 정체되었습니다. 다시 시도할 수 있습니다.':e(message||'미분석')}</p>
+    <p id="contract-ai-status" role="status" aria-live="polite">${running?'계약서 전체를 분석하고 있습니다…':stale?'분석이 오래 멈춰 있어요. 다시 시도해 주세요.':e(message||'미분석')}</p>
     <ul>${(result?.warnings||[]).map((warning)=>`<li>${e(warning)}</li>`).join('')}</ul>
     <button id="analyze-contract" type="button" ${running||!consent?'disabled':''}>${running?'분석 중…':result?.status==='failed'||stale?'AI 계약서 분석 다시 시도':'AI 계약서 분석하기'}</button>
     <p class="hint">법률 자문이 아닌 AI 참고 분석입니다. 계약서 원문을 직접 확인하세요.</p></section>`;

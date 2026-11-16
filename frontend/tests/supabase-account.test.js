@@ -13,7 +13,7 @@ test('direct account adapter verifies user and ignores caller ownership', async 
   await api('/api/profile'); assert.deepEqual(filter,['user_id','A']);
   await api('/api/profile',{method:'PUT',body:{display_name:' name ',user_id:'B'}});
   assert.deepEqual(saved,{display_name:'name',user_id:'A'});
-  await assert.rejects(api('/api/living-records',{method:'POST'}),/서버 연결/);
+  await assert.rejects(api('/api/living-records',{method:'POST'}),/곧 사용할 수 있어요/);
   client.auth.getUser=async()=>({data:{user:null},error:new Error()});
   await assert.rejects(api('/api/profile'),/로그인/);
 });
