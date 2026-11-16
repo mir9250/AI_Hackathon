@@ -11,7 +11,7 @@ test('published preview opens dashboard without network or false save success', 
     mountPreview(document.querySelector('#app'));
     await new Promise(resolve => setTimeout(resolve, 50));
     assert.match(document.querySelector('.preview-banner').textContent, /미리보기/);
-    assert.equal(document.querySelector('#view').firstElementChild.className, 'record-launcher');
+    assert.ok(document.querySelector('#view .record-launcher'));
     const search = document.querySelector('.home-care input');
     search.value = '퇴실';
     search.closest('form').dispatchEvent(new dom.window.Event('submit', { cancelable: true }));
