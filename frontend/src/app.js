@@ -127,7 +127,7 @@ function start() {
   async function loadAccount() {
     const current = invalidate();
     view.dataset.page = 'loading';
-    view.innerHTML = '<section class="card"><p role="status">저장된 정보를 불러오고 있습니다…</p></section>';
+    view.innerHTML = '<section class="card"><p role="status">저장된 정보를 불러오고 있어요…</p></section>';
     try {
       const values = await Promise.all([
         api('/api/profile', { signal: controller.signal }),
@@ -139,7 +139,7 @@ function start() {
     } catch (error) {
       if (current !== generation || error.name === 'AbortError') return;
       showApiError(error);
-      view.innerHTML = '<section class="card"><h2>기록을 불러오지 못했습니다</h2><button id="reload">다시 조회</button></section>';
+      view.innerHTML = '<section class="card"><h2>기록을 불러오지 못했어요</h2><button id="reload">다시 불러오기</button></section>';
       document.querySelector('#reload').onclick = loadAccount;
     }
   }
@@ -362,7 +362,7 @@ function start() {
       setTimeout(() => { if (userId === session.user.id) loadAccount(); }, 0);
     }
   });
-  view.innerHTML = '<section class="card"><p role="status">로그인 상태를 확인하고 있습니다…</p></section>';
+  view.innerHTML = '<section class="card"><p role="status">로그인 상태를 확인하고 있어요…</p></section>';
 }
 
 function authError(error) {
