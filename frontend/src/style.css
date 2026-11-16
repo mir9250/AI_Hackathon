@@ -299,3 +299,9 @@ input[type=checkbox],input[type=radio]{width:auto;accent-color:var(--ink)}
   [data-page=home] .community article{display:block}
 }
 #account-view>h2{margin-top:40px}
+
+.notice-modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(58,46,20,.45)}
+.notice-card{width:min(420px,100%);box-sizing:border-box;background:#fff;border:2px solid #3A2E14;border-radius:20px;box-shadow:6px 6px 0 #3A2E14;padding:28px 26px;text-align:center}
+.notice-card h2{margin:0 0 10px;font-size:22px;color:#3A2E14}
+.notice-card p{margin:0 0 22px;line-height:1.6;color:#6B5A33}
+.notice-card button{min-width:140px}

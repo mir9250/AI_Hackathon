@@ -26,6 +26,24 @@ function notify(text, isError = false) {
   message.setAttribute('role', isError ? 'alert' : 'status');
 }
 
+function showNotice(title, text, action = '확인') {
+  document.querySelector('.notice-modal')?.remove();
+  const modal = document.createElement('div');
+  modal.className = 'notice-modal';
+  modal.innerHTML = `<div class="notice-card" role="dialog" aria-modal="true" aria-labelledby="notice-title">
+    <h2 id="notice-title"></h2><p></p><button type="button"></button></div>`;
+  modal.querySelector('h2').textContent = title;
+  modal.querySelector('p').textContent = text;
+  const button = modal.querySelector('button');
+  button.textContent = action;
+  const close = () => { modal.remove(); document.querySelector('#email')?.focus(); };
+  button.onclick = close;
+  modal.onclick = (event) => { if (event.target === modal) close(); };
+  modal.onkeydown = (event) => { if (event.key === 'Escape') close(); };
+  document.body.append(modal);
+  button.focus();
+}
+
 function validOrigin(value, localAllowed = true) {
   try {
     const url = new URL(value);
@@ -114,9 +132,14 @@ function start() {
           ? await supabase.auth.signUp({ ...credentials, options: { emailRedirectTo: window.location.origin } })
           : await supabase.auth.signInWithPassword(credentials);
         if (result.error) throw result.error;
-        if (signup && !result.data.session && current === generation) {
-          form.reset();
-          notify('이메일 확인이 필요합니다. 받은 편지함의 확인 링크를 누른 후 로그인해 주세요.');
+        if (signup && current === generation) {
+          if (!result.data.session) {
+            authView(false);
+            notify('이메일 확인이 필요합니다. 받은 편지함의 확인 링크를 누른 후 로그인해 주세요.');
+            showNotice('회원가입이 완료되었어요', '받은 편지함의 확인 링크를 누른 뒤, 이 화면에서 로그인해 주세요.', '로그인하기');
+          } else {
+            showNotice('회원가입이 완료되었어요', '돌려받집에 오신 걸 환영해요. 입실 사진부터 기록을 시작해 보세요.', '시작하기');
+          }
         }
       } catch (error) {
         if (current === generation) notify(authError(error), true);
