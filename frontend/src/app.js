@@ -8,7 +8,7 @@ import { mountLiving } from './living.js';
 import { accountMarkup } from './ui.js';
 
 export function mountApp(root, env, createClient, apiOverride = null) {
-root.innerHTML = `<header><a class="brand" href="#"><img src="/logo.png" alt="" class="brand-logo"> <span>돌려받집</span></a>
+root.innerHTML = `<header><a class="brand" href="#"><img src="/logo-brown.png" alt="" class="brand-logo"> <span>돌려받집</span></a>
   <span class="header-note">안심할 수 있는 집의 시작</span><nav class="main-nav" aria-label="주요 메뉴" hidden><button type="button" data-go="home">홈</button><button type="button" data-go="records">내 집 기록</button><button type="button" data-go="contracts">계약서</button><button type="button" data-go="community">커뮤니티</button></nav><button id="mypage" class="quiet" hidden>마이페이지</button><button id="logout" class="quiet" hidden>로그아웃</button></header>
   <main><div id="message" role="status" aria-live="polite"></div>
   <p id="slow" class="notice" hidden>서버를 깨우고 있습니다. 첫 연결에는 시간이 걸릴 수 있습니다.</p>
@@ -88,7 +88,7 @@ function start() {
     view.dataset.page = 'auth';
     view.innerHTML = `<div class="auth-layout"><section class="intro"><span class="eyebrow">DEPOSIT GUARDIAN</span>
       <h1>소중한 보증금,<br>기록으로 지켜요.</h1><p>계약부터 퇴실까지.<br>나의 집을 위한 꼼꼼한 준비를 시작하세요.</p>
-      <div class="home-symbol" aria-hidden="true">⌂</div><span class="intro-caption">오늘의 기록이 내일의 안심으로</span></section>
+      <span class="intro-caption">오늘의 기록이 내일의 안심으로</span></section>
       <section class="card auth-card"><span class="step">나의 공간 시작하기</span><h2>${signup ? '회원가입' : '로그인'}</h2>
       <form id="auth-form"><label for="email">이메일</label><input id="email" name="email" type="email" required autocomplete="email">
       <label for="password">비밀번호</label><input id="password" name="password" type="password" required
