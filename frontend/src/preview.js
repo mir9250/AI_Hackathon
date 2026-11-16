@@ -15,7 +15,7 @@ export function mountPreview(root) {
   };
   const api = async (path, options = {}) => {
     if (options.method && options.method !== 'GET') {
-      throw new Error('현재는 화면 미리보기입니다. 실제 저장·AI 분석은 백엔드 연결 후 사용할 수 있습니다.');
+      throw new Error('지금은 화면 미리보기예요. 실제 저장과 AI 분석은 로그인한 뒤 사용할 수 있어요.');
     }
     if (path === '/api/profile') return { display_name: '미리보기 사용자' };
     if (path === '/api/house') return sampleHouse;
@@ -28,7 +28,7 @@ export function mountPreview(root) {
   }, () => ({ auth }), api);
   const banner = document.createElement('aside');
   banner.className = 'preview-banner';
-  banner.textContent = '화면 미리보기 · 로그인 없이 둘러보세요. 실제 사진·기록 저장과 AI 분석은 백엔드 연결 후 제공됩니다.';
+  banner.textContent = '화면 미리보기 · 로그인 없이 둘러보세요. 사진·기록 저장과 AI 분석은 실제 서비스에서 사용할 수 있어요.';
   root.prepend(banner);
   const logout = root.querySelector('#logout');
   logout.textContent = '처음으로';

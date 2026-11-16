@@ -11,7 +11,7 @@ if (import.meta.env.VITE_UI_PREVIEW === 'true') {
   mountApp(document.querySelector('#app'), { ...import.meta.env, VITE_API_BASE_URL: import.meta.env.VITE_SUPABASE_URL }, () => client, createSupabaseAccountApi(client));
   const notice = document.createElement('aside');
   notice.className = 'preview-banner';
-  notice.textContent = 'Supabase 연결 · 로그인·프로필·나의 집 저장을 사용할 수 있습니다. 사진·계약서·AI 서버는 연결 준비 중입니다.';
+  notice.textContent = '지금은 로그인·프로필·나의 집 저장만 할 수 있어요. 사진·계약서·AI 기능은 곧 열려요.';
   document.querySelector('#app').prepend(notice);
 } else {
   mountApp(document.querySelector('#app'), import.meta.env, createClient);

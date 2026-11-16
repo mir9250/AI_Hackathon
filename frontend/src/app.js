@@ -8,10 +8,10 @@ import { mountLiving } from './living.js';
 import { accountMarkup } from './ui.js';
 
 export function mountApp(root, env, createClient, apiOverride = null) {
-root.innerHTML = `<header><a class="brand" href="#"><img src="/logo.png" alt="" class="brand-logo"> <span>돌려받집</span></a>
+root.innerHTML = `<header><a class="brand" href="#"><img src="/logo-brown.png" alt="" class="brand-logo"> <span>돌려받집</span></a>
   <span class="header-note">안심할 수 있는 집의 시작</span><nav class="main-nav" aria-label="주요 메뉴" hidden><button type="button" data-go="home">홈</button><button type="button" data-go="records">내 집 기록</button><button type="button" data-go="contracts">계약서</button><button type="button" data-go="community">커뮤니티</button></nav><button id="mypage" class="quiet" hidden>마이페이지</button><button id="logout" class="quiet" hidden>로그아웃</button></header>
   <main><div id="message" role="status" aria-live="polite"></div>
-  <p id="slow" class="notice" hidden>서버를 깨우고 있습니다. 첫 연결에는 시간이 걸릴 수 있습니다.</p>
+  <p id="slow" class="notice" hidden>잠시만 기다려 주세요. 처음 접속할 때는 연결에 시간이 조금 걸릴 수 있어요.</p>
   <div id="view"></div></main><footer>내 집의 상태를 기록하고, 보증금을 지키는 첫걸음.<br>
   AI 결과는 참고 정보이며 법률적 판단이나 손상 원인을 확정하지 않습니다.</footer>`;
 
@@ -37,8 +37,10 @@ function validOrigin(value, localAllowed = true) {
 
 if (!validOrigin(env.VITE_API_BASE_URL) || !validOrigin(env.VITE_SUPABASE_URL)
     || !env.VITE_SUPABASE_PUBLISHABLE_KEY) {
-  view.innerHTML = `<section class="card"><h1>연결 설정이 필요합니다</h1>
-    <p>frontend/.env.example을 .env로 복사하고 API 주소와 Supabase 공개 연결 정보를 설정한 후 개발 서버를 다시 시작해 주세요.</p></section>`;
+  view.innerHTML = `<section class="card"><h1>서비스 연결 설정이 필요해요</h1>
+    <p>지금은 서비스에 접속할 수 없어요. 잠시 후 다시 시도해 주세요.</p></section>`;
+  // 개발자용 안내는 화면 대신 콘솔에만 남깁니다.
+  console.warn('[돌려받집] frontend/.env.example을 .env로 복사하고 VITE_API_BASE_URL·VITE_SUPABASE_URL·VITE_SUPABASE_PUBLISHABLE_KEY를 설정한 뒤 다시 빌드하세요.');
 } else {
   start();
 }
@@ -88,12 +90,12 @@ function start() {
     view.dataset.page = 'auth';
     view.innerHTML = `<div class="auth-layout"><section class="intro"><span class="eyebrow">DEPOSIT GUARDIAN</span>
       <h1>소중한 보증금,<br>기록으로 지켜요.</h1><p>계약부터 퇴실까지.<br>나의 집을 위한 꼼꼼한 준비를 시작하세요.</p>
-      <div class="home-symbol" aria-hidden="true">⌂</div><span class="intro-caption">오늘의 기록이 내일의 안심으로</span></section>
+      <span class="intro-caption">오늘의 기록이 내일의 안심으로</span></section>
       <section class="card auth-card"><span class="step">나의 공간 시작하기</span><h2>${signup ? '회원가입' : '로그인'}</h2>
       <form id="auth-form"><label for="email">이메일</label><input id="email" name="email" type="email" required autocomplete="email">
       <label for="password">비밀번호</label><input id="password" name="password" type="password" required
         autocomplete="${signup ? 'new-password' : 'current-password'}">
-      ${signup ? '<p class="hint">Supabase 프로젝트에 설정된 비밀번호 정책이 적용됩니다.</p>' : ''}
+      ${signup ? '<p class="hint">너무 짧거나 쉬운 비밀번호는 사용할 수 없어요.</p>' : ''}
       <button type="submit">${signup ? '회원가입' : '로그인'}</button></form>
       <button id="switch-auth" class="text-button">${signup ? '이미 계정이 있나요? 로그인' : '처음 오셨나요? 회원가입'}</button>
       </section></div>`;
@@ -365,10 +367,10 @@ function start() {
 
 function authError(error) {
   if (error.code === 'email_not_confirmed') return '이메일 확인이 필요합니다. 받은 편지함의 확인 링크를 확인해 주세요.';
-  if (error.status === 429 || error.code === 'over_email_send_rate_limit') return '인증 이메일 또는 요청 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.';
+  if (error.status === 429 || error.code === 'over_email_send_rate_limit') return '요청이 너무 많아요. 잠시 후 다시 시도해 주세요.';
   if (error.code === 'invalid_credentials') return '이메일 또는 비밀번호를 확인해 주세요.';
-  if (error.code === 'weak_password') return 'Supabase 프로젝트의 비밀번호 정책에 맞는 비밀번호를 입력해 주세요.';
-  return '인증 요청에 실패했습니다. 입력 정보와 네트워크를 확인해 주세요.';
+  if (error.code === 'weak_password') return '비밀번호가 너무 짧거나 쉬워요. 더 안전한 비밀번호를 입력해 주세요.';
+  return '로그인하지 못했어요. 입력한 정보와 인터넷 연결을 확인해 주세요.';
 }
 
 }

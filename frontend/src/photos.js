@@ -9,7 +9,7 @@ export function validatePhotoFile(file) {
   const ext = file.name.split('.').pop().toLowerCase();
   const mime = MIME[ext];
   const error = !mime || (file.type && file.type !== mime && !(ext === 'heic' && file.type === 'image/heif'))
-    ? '지원하지 않는 사진 형식입니다.' : !file.size || file.size > MAX_BYTES ? '사진은 0바이트 초과, 20MiB 이하여야 합니다.' : '';
+    ? 'JPG·PNG·HEIC·WEBP 사진만 올릴 수 있어요.' : !file.size || file.size > MAX_BYTES ? '사진은 한 장에 20MB 이하만 올릴 수 있어요.' : '';
   return { mime, error };
 }
 
@@ -24,8 +24,8 @@ export function mountPhotos(root, api, signal) {
   const analyzing = new Set();
   const analysisErrors = new Map();
   root.innerHTML = `<section class="card photo-section"><span class="step">입실 기록</span>
-    <h2>입실 사진 등록</h2><details class="shoot-guide" open><summary>어디를 어떻게 찍어야 하나요?</summary><ul><li>벽·벽지: 방 전체와 모서리, 얼룩·들뜸·찢어진 부분</li><li>바닥: 방 전체와 긁힘·찍힘·변색된 부분</li><li>천장·창틀: 물자국, 틈새, 결로 흔적</li><li>욕실·주방: 타일, 실리콘, 싱크대 아래와 배관 주변</li><li>문·수납장·옵션: 문틀과 손잡이, 가전 외관과 작동 상태</li></ul><p>장소마다 전체 사진 한 장과 가까이 찍은 사진을 남기세요. 원본과 촬영 날짜를 보관하고, 퇴실 때 같은 위치·각도·조명으로 다시 찍으면 비교하기 좋아요.</p></details><p>사진은 한 번에 최대 10장, 장당 20MiB까지 등록할 수 있습니다. JPG·PNG·HEIC·WEBP를 지원합니다.</p>
-    <p class="hint">가상 사진으로 테스트하세요. AI 분석 버튼을 누르면 사진이 외부 OpenAI 서비스로 전송되며 API 사용료가 발생할 수 있습니다.</p>
+    <h2>입실 사진 등록</h2><details class="shoot-guide" open><summary>어디를 어떻게 찍어야 하나요?</summary><ul><li>벽·벽지: 방 전체와 모서리, 얼룩·들뜸·찢어진 부분</li><li>바닥: 방 전체와 긁힘·찍힘·변색된 부분</li><li>천장·창틀: 물자국, 틈새, 결로 흔적</li><li>욕실·주방: 타일, 실리콘, 싱크대 아래와 배관 주변</li><li>문·수납장·옵션: 문틀과 손잡이, 가전 외관과 작동 상태</li></ul><p>장소마다 전체 사진 한 장과 가까이 찍은 사진을 남기세요. 원본과 촬영 날짜를 보관하고, 퇴실 때 같은 위치·각도·조명으로 다시 찍으면 비교하기 좋아요.</p></details><p>사진은 한 번에 최대 10장, 장당 20MB까지 등록할 수 있습니다. JPG·PNG·HEIC·WEBP를 지원합니다.</p>
+    <p class="hint">AI 분석을 누르면 사진이 분석을 위해 외부 AI 서비스(OpenAI)로 전송돼요. 사람 얼굴이나 개인정보가 찍히지 않게 주의해 주세요.</p>
     <label for="photo-files">사진 선택</label><input id="photo-files" type="file" multiple accept=".jpg,.jpeg,.png,.heic,.webp">
     <p id="photo-message" role="status" aria-live="polite"></p>
     <form id="photo-upload-form"><div id="photo-selection" class="photo-grid"></div>
@@ -77,7 +77,7 @@ export function mountPhotos(root, api, signal) {
       savedPhotos = photos;
       lastLoaded = Date.now();
       renderPhotos();
-      find('photo-list-message').textContent = photos.length ? '표시 주소가 만료되면 다시 조회해 주세요.' : '저장된 입실 사진이 없습니다.';
+      find('photo-list-message').textContent = photos.length ? '사진이 안 보이면 새로고침해 주세요.' : '저장된 입실 사진이 없습니다.';
     } catch (error) {
       if (alive && error.name !== 'AbortError') find('photo-list-message').textContent = error.message;
     } finally { loading = false; }
@@ -88,7 +88,7 @@ export function mountPhotos(root, api, signal) {
       find('photo-list').innerHTML = savedPhotos.map((photo) => `<article class="photo-card">
         ${photo.signed_url?`<img src="${escapeHtml(photo.signed_url)}" alt="${escapeHtml(photo.location)} 입실 사진" loading="lazy">`:""}
         <h3>${escapeHtml(photo.location)}</h3><p class="hint">${escapeHtml(koreanTime(photo.created_at))}</p>
-        <p class="hint">${escapeHtml(photo.mime_type)} · ${(photo.size_bytes / 1024 / 1024).toFixed(2)}MiB</p>
+        <p class="hint">${escapeHtml(photo.mime_type)} · ${(photo.size_bytes / 1024 / 1024).toFixed(1)}MB</p>
         ${deleting.has(photo.photo_id)?'<p>삭제 요청을 확인·처리하고 있습니다…</p>':photo.deleting?'<p>삭제 중입니다. 삭제 버튼으로 재시도해 주세요.</p>':analysisMarkup(photo, analyzing.has(photo.photo_id), analysisErrors.get(photo.photo_id))}
         <button type="button" class="quiet" data-delete-photo="${escapeHtml(photo.photo_id)}" ${deleting.has(photo.photo_id)||analyzing.has(photo.photo_id)?'disabled':''}>${deleting.has(photo.photo_id)?'삭제 처리 중…':photo.deleting?'사진 삭제 재시도':'사진 삭제'}</button></article>`).join('');
       root.querySelectorAll('[data-delete-photo]').forEach(button=>{button.onclick=async()=>{
@@ -106,7 +106,7 @@ export function mountPhotos(root, api, signal) {
       };});
       root.querySelectorAll('#photo-list img').forEach((img) => {
         img.onerror = () => {
-          if (alive) find('photo-list-message').textContent = '사진 표시 주소가 만료되었거나 연결에 실패했습니다. 다시 조회해 주세요.';
+          if (alive) find('photo-list-message').textContent = '사진을 불러오지 못했어요. 새로고침해 주세요.';
         };
       });
       root.querySelectorAll('[data-analyze]').forEach((button) => {

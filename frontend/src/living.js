@@ -4,7 +4,7 @@ import { escapeHtml, koreanTime } from './ui.js';
 export function mountLiving(root, api, signal) {
   let preview = '', uploadId = crypto.randomUUID();
   let alive = true, busy = false, loading = false;
-  root.innerHTML = `<section class="card photo-section"><span class="step">거주 중 기록</span><h2>집에 문제가 생겼나요?</h2><p>사진과 발견 상황을 정리하고, 유형별 대처 순서를 확인하세요.</p><p class="hint">사진 AI 판독이 아닌 기본 안내입니다. 기록 저장 버튼을 누르면 사진과 설명이 내 계정에 저장됩니다. 대처 안내는 사진 AI 판독이 아닌 유형별 기본 안내입니다.</p><form id="living-form"><label for="living-type">어떤 문제인가요?</label><select id="living-type"><option value="mold">곰팡이·습기</option><option value="wall">벽지 훼손·들뜸</option><option value="other">기타 손상</option></select><label for="living-photo">문제 부위 사진 (최대 20MiB)</label><input id="living-photo" type="file" accept=".jpg,.jpeg,.png,.webp,.heic" required><img id="living-preview" class="living-preview" alt="문제 부위 미리보기" hidden><label for="living-description">발견한 위치와 상황</label><textarea id="living-description" required maxlength="2000" placeholder="예: 어제 침실 창가 벽지에 검은 얼룩을 발견했어요. 비가 온 뒤 벽이 축축해졌어요."></textarea><button>대처 방법 확인</button><button id="save-living" type="button">사진과 상황 기록 저장</button><p id="living-status" role="status"></p></form><div id="living-result" aria-live="polite"></div></section><section class="photo-section"><div class="photo-heading"><h2>나의 거주 중 기록</h2><button id="refresh-living" class="quiet">다시 조회</button></div><p id="living-list-status" role="status"></p><div id="living-list" class="photo-grid"></div></section>`;
+  root.innerHTML = `<section class="card photo-section"><span class="step">거주 중 기록</span><h2>집에 문제가 생겼나요?</h2><p>사진과 발견 상황을 정리하고, 유형별 대처 순서를 확인하세요.</p><p class="hint">사진 AI 판독이 아닌 기본 안내입니다. 기록 저장 버튼을 누르면 사진과 설명이 내 계정에 저장됩니다. 대처 안내는 사진 AI 판독이 아닌 유형별 기본 안내입니다.</p><form id="living-form"><label for="living-type">어떤 문제인가요?</label><select id="living-type"><option value="mold">곰팡이·습기</option><option value="wall">벽지 훼손·들뜸</option><option value="other">기타 손상</option></select><label for="living-photo">문제 부위 사진 (최대 20MB)</label><input id="living-photo" type="file" accept=".jpg,.jpeg,.png,.webp,.heic" required><img id="living-preview" class="living-preview" alt="문제 부위 미리보기" hidden><label for="living-description">발견한 위치와 상황</label><textarea id="living-description" required maxlength="2000" placeholder="예: 어제 침실 창가 벽지에 검은 얼룩을 발견했어요. 비가 온 뒤 벽이 축축해졌어요."></textarea><button>대처 방법 확인</button><button id="save-living" type="button">사진과 상황 기록 저장</button><p id="living-status" role="status"></p></form><div id="living-result" aria-live="polite"></div></section><section class="photo-section"><div class="photo-heading"><h2>나의 거주 중 기록</h2><button id="refresh-living" class="quiet">다시 조회</button></div><p id="living-list-status" role="status"></p><div id="living-list" class="photo-grid"></div></section>`;
   const find = id => root.querySelector(`#${id}`);
   const release = () => { if (preview) URL.revokeObjectURL(preview); preview = ''; };
   find('living-photo').onchange = () => {
@@ -18,7 +18,7 @@ export function mountLiving(root, api, signal) {
     if (error) { find('living-photo').value = ''; return; }
     preview = URL.createObjectURL(file);
     find('living-preview').src = preview; find('living-preview').hidden = false;
-    find('living-preview').onerror = () => { find('living-preview').hidden = true; find('living-status').textContent = '이 형식은 미리보기가 지원되지 않을 수 있습니다. 원본 사진을 보관하세요.'; };
+    find('living-preview').onerror = () => { find('living-preview').hidden = true; find('living-status').textContent = '이 사진 형식은 미리보기가 안 될 수 있어요. 원본 사진은 따로 보관해 주세요.'; };
   };
   find('living-form').onsubmit = event => {
     event.preventDefault();
@@ -44,7 +44,7 @@ export function mountLiving(root, api, signal) {
       find('living-list').innerHTML = records.map(record => `<article class="photo-card"><img src="${escapeHtml(record.signed_url)}" alt="${escapeHtml(labels[record.category] || '거주 문제')} 사진"><h3>${escapeHtml(labels[record.category] || '거주 문제')}</h3><p class="hint">${escapeHtml(koreanTime(record.created_at))}</p><p style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHtml(record.description)}</p></article>`).join('');
       find('living-list-status').textContent = records.length ? '내 계정에 저장된 기록입니다.' : '아직 저장된 거주 중 기록이 없습니다.';
       root.querySelectorAll('#living-list img').forEach(img => { img.onerror = () => {
-        if (alive) find('living-list-status').textContent = '사진 주소가 만료되었거나 연결에 실패했습니다. 다시 조회해 주세요.';
+        if (alive) find('living-list-status').textContent = '사진을 불러오지 못했어요. 새로고침해 주세요.';
       }; });
     } catch (error) {
       if (alive && error.name !== 'AbortError') find('living-list-status').textContent = `기록 조회 실패: ${error.message}`;

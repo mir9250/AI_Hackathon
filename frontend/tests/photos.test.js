@@ -179,12 +179,12 @@ test('AI failure shows cause and retry control without pretending damage was abs
     assert.match(app.root.textContent, /AI 분석 다시 시도/);
     assert.doesNotMatch(app.root.textContent, /의심 흔적 미발견/);
     await app.remount();
-    assert.match(app.root.textContent, /크레딧/);
+    assert.match(app.root.textContent, /AI 기능을 잠시 사용할 수 없어요/);
   } finally { app.close(); }
 });
 
 test('stale analysis can retry; completed none is distinct; pending does not get stuck', () => {
-  assert.match(analysisMarkup({ ...photo, analysis: { status: 'analyzing', started_at: '2000-01-01T00:00:00Z' } }), /3분 이상/);
+  assert.match(analysisMarkup({ ...photo, analysis: { status: 'analyzing', started_at: '2000-01-01T00:00:00Z' } }), /오래 멈춰 있어요/);
   assert.doesNotMatch(analysisMarkup({ ...photo, analysis: { status: 'analyzing', started_at: '2000-01-01T00:00:00Z' } }), /disabled/);
   assert.doesNotMatch(analysisMarkup({ ...photo, analysis: { status: 'pending' } }), /disabled/);
   const none = analysisMarkup({ ...photo, analysis: { status: 'completed', overall_result: 'none', damages: [] } });
